@@ -1,0 +1,28 @@
+---
+# ## Default Logstash configuration from logstash-docker.
+# ## from https://github.com/elastic/logstash-docker/blob/master/build/logstash/config/logstash-full.yml
+# #
+# http.host: "0.0.0.0"
+# xpack.monitoring.elasticsearch.hosts: [ "http://elasticsearch:9200" ]
+
+# ## X-Pack security credentials
+# #
+# xpack.monitoring.enabled: true
+# xpack.monitoring.elasticsearch.username: elastic
+# xpack.monitoring.elasticsearch.password: changeme
+
+
+#path.data: /var/lib/logstash
+
+
+#path.logs: /var/log/logstash
+
+
+# path.config: /etc/logstash/conf.d/*.conf
+
+queue.type: memory
+
+
+# dead_letter_queue.enable: true
+# dead_letter_queue.max_bytes: 8gb
+# path.dead_letter_queue: "/var/lib/logstash/dead_letter_queue"

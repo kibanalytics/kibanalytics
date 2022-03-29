@@ -1,9 +1,51 @@
 version: "3.5"
 
+volumes:
+  data-es:
+    driver: local
+
 services:
+
   redis:
-    network_mode: host
+    # network_mode: host
     image: redis
     ports:
       - "${REDIS_LISTEN:-127.0.0.1:6379:6379}"
+
+
+  logstash:
+    network_mode: host
+    image: docker.elastic.co/logstash/logstash:7.14.1
+    volumes:
+      - ./elk/logstash/pipeline/:/usr/share/logstash/pipeline/
+      - ./elk/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+
+  elasticsearch:
+    # network_mode: host
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+
+    environment:
+      - "xpack.security.enabled=false"
+      - "discovery.seed_hosts=127.0.0.1:9300"
+      - "discovery.type=single-node"
+      - "ES_JAVA_OPTS=${ELASTICSEARCH_JAVA_OPTS:--Xms512m -Xmx512m}"
+
+    volumes:
+      - data-es:/usr/share/elasticsearch/data:rw
+    ports:
+      - ${ELASTICSEARCH_LISTEN:-9200:9200}
+
+
+  kibana:
+    network_mode: host
+    image: docker.elastic.co/kibana/kibana:7.14.1
+    volumes:
+      - ./elk/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    # ports:
+    #   - ${KIBANA_LISTEN:-5601:5601}
 
