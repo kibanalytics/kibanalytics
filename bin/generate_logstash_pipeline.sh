@@ -42,12 +42,12 @@ cat <<EOF
 input {
 EOF
 
-for input in ${REDIS_TRACKING_URIS}; do
+for input in ${REDIS_URIS}; do
   echo "
   redis {
     type => \"tracker\"
     data_type => \"list\"
-    key => \"${REDIS_TRACKING_KEY}\"
+    key => \"${TRACKING_KEY}\"
     port => \"$(parse_port $input)\"
     host => \"$(parse_host $input)\"
     db => $(parse_path $input | tr -d '/')
