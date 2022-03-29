@@ -3,3 +3,4 @@
 src/node_modules
 src/package-lock.json
 
+elk/logstash/pipeline/tracker.conf
