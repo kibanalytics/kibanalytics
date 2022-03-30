@@ -3,61 +3,17 @@ version: "3.5"
 volumes:
   data-es:
     driver: local
-  data-varnish:
-    driver: local
 
 services:
 
-  node:
-    container_name: kibanalytics.node
-    image: node:16
-    restart: unless-stopped
-    command: node /app/index.js
-    volumes:
-      - .:/app
-      - ./node_modules:/app/node_modules
-
   redis:
-    container_name: kibanalytics.redis
     # network_mode: host
     image: redis
     ports:
       - "${REDIS_LISTEN:-127.0.0.1:6379:6379}"
 
-  varnish:
-    container_name: kibanalytics.varnish
-    image: darioguarascio/varnish-elk-docker:latest
-    volumes:
-      - data-varnish:/vcache:rw
-      - ./config/varnish_backends.vcl:/usr/share/varnish/vcl/varnish_backends.vcl
-
-    environment:
-      ENV: ${ENV:-dev}
-      VARNISHD_MEMORY: ${VARNISHD_MEMORY:-malloc,32m}
-      VARNISH_PURGE_KEY: ${VARNISH_PURGE_KEY:-dev}
-
-    healthcheck:
-      test: ["CMD", "sh", "-c", "test -e /proc/`cat /varnish.pid` || (kill -s 15 -1 && (sleep 10; kill -s 9 -1)) " ]
-      interval: 5s
-      timeout: 1s
-      retries: 1
-      start_period: 5s
-    # logging:
-    #   driver: syslog
-    #   options:
-    #     cache-disabled: "false"
-    #     syslog-address: udp://${VARNISH_LOGGER_IP:-127.0.0.1}:${VARNISH_LOGGER_PORT:-5445}
-    #     # syslog-format: "rfc3164"
-    #     # tag: "node-red"
-    restart: always
-    ports:
-      - ${VARNISH_LISTEN:-80}:80
-
-
-
 
   logstash:
-    container_name: kibanalytics.logstash
     network_mode: host
     image: docker.elastic.co/logstash/logstash:7.14.1
     volumes:
@@ -70,9 +26,9 @@ services:
 
 
   elasticsearch:
-    container_name: kibanalytics.elasticsearch
     # network_mode: host
     image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+    hostname: elasticsearch
 
     environment:
       - "xpack.security.enabled=false"
@@ -87,10 +43,12 @@ services:
 
 
   kibana:
-    container_name: kibanalytics.kibana
+    # network_mode: host
     image: docker.elastic.co/kibana/kibana:7.14.1
     volumes:
       - ./elk/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     ports:
-      - ${KIBANA_LISTEN:-5601:5601}
+      - "5601:5601"
+    # ports:
+    #   - ${KIBANA_LISTEN:-5601:5601}
 
