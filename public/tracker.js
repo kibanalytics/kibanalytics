@@ -31,7 +31,6 @@
     history,
   } = window;
 
-
   const script = document.querySelector('script[data-website-id]');
 
   if (!script) return;
@@ -45,13 +44,14 @@
   const cssEvents = attr('data-css-events') !== 'false';
   const domain = attr('data-domains') || '';
   const domains = domain.split(',').map(n => n.trim());
+  const serverSide = attr('data-server-side') || {};
 
-  const eventClass = /^umami--([a-z]+)--([\w]+[\w-]*)$/;
-  const eventSelect = "[class*='umami--']";
-  const cacheKey = 'umami.cache';
+  const eventClass = /^kibanalytics--([a-z]+)--([\w]+[\w-]*)$/;
+  const eventSelect = "[class*='kibanalytics--']";
+  const cacheKey = 'kibanalytics.cache';
 
   const trackingDisabled = () =>
-    (localStorage && localStorage.getItem('umami.disabled')) ||
+    (localStorage && localStorage.getItem('kibanalytics.disabled')) ||
     (dnt && doNotTrack()) ||
     (domain && !domains.includes(hostname));
 
@@ -68,7 +68,7 @@
   const post = (url, data, callback) => {
     const req = new XMLHttpRequest();
     req.open('POST', url, true);
-    req.setRequestHeader('Content-Type', 'text/plain');
+    req.setRequestHeader('Content-Type', 'application/json');
 
     req.onreadystatechange = () => {
       if (req.readyState === 4) {
@@ -76,15 +76,17 @@
       }
     };
 
-    req.send(JSON.stringify(data));
+    console.log(data);
+    req.send(JSON.stringify({ ...data, serverSide }));
   };
 
+  // @TODO check cache payload
   const getPayload = () => ({
     website,
     hostname,
     screen,
     language,
-    cache: useCache && sessionStorage.getItem(cacheKey),
+    // cache: useCache && sessionStorage.getItem(cacheKey),
     url: currentUrl,
   });
 
@@ -99,7 +101,7 @@
     if (trackingDisabled()) return;
 
     post(
-      `${root}/api/collect`,
+      `${root}/collect`,
       {
         type,
         payload,
@@ -144,7 +146,7 @@
       payload,
     });
 
-    navigator.sendBeacon(`${root}/api/collect`, data);
+    navigator.sendBeacon(`${root}/collect`, data);
   };
 
   const addEvents = node => {
@@ -205,12 +207,12 @@
 
   /* Global */
 
-  if (!window.umami) {
-    const umami = eventValue => trackEvent(eventValue);
-    umami.trackView = trackView;
-    umami.trackEvent = trackEvent;
+  if (!window.kibanalytics) {
+    const kibanalytics = eventValue => trackEvent(eventValue);
+    kibanalytics.trackView = trackView;
+    kibanalytics.trackEvent = trackEvent;
 
-    window.umami = umami;
+    window.kibanalytics = kibanalytics;
   }
 
   /* Start */

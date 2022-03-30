@@ -28,6 +28,7 @@ services:
   elasticsearch:
     # network_mode: host
     image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+    hostname: elasticsearch
 
     environment:
       - "xpack.security.enabled=false"
@@ -42,10 +43,12 @@ services:
 
 
   kibana:
-    network_mode: host
+    # network_mode: host
     image: docker.elastic.co/kibana/kibana:7.14.1
     volumes:
       - ./elk/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - "5601:5601"
     # ports:
     #   - ${KIBANA_LISTEN:-5601:5601}
 
