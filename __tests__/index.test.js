@@ -44,9 +44,9 @@ describe('Collect Controller', () => {
         'content-type': 'application/json'
     };
 
-    test('Collect data', async () => {
+    test('Custom event', async () => {
         const url = new URL(`${server}${endpoint}`);
-        const body = { abc: 100 };
+        const body = { type: 'custom', payload: { foo: 'bar' } };
 
         const response = await fetch(url, {
             method: 'post',
@@ -62,7 +62,7 @@ describe('Collect Controller', () => {
         }
 
         const data = await response.json();
-        expect(data.message).toEqual('Hello World');
+        expect(data.status).toEqual('success');
 
         const outputFileName = 'collect-data';
         const outputFilePath = path.join(OUTPUT_DIR_PATH, `${outputFileName}.test.json`);
