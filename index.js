@@ -26,7 +26,7 @@ const errorHandler = require('./src/error-handler');
     app.use(session);
     app.use(express.static('public'));
 
-    if (process.env.EXPRESS_CORS.toLowerCase() === 'true') {
+    if (!!+process.env.EXPRESS_CORS) {
         app.use(cors(corsOptions));
         app.options('*', cors());
     }

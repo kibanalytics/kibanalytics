@@ -5,6 +5,7 @@ module.exports = {
         hostname: { type: 'string' },
         url: { type: 'string' },
         referrer: { type: 'string' },
+        platform: { type: 'string' },
         screen: { type: 'string' },
         language: { type: 'string' },
         cache: { type: 'string' }
@@ -14,8 +15,9 @@ module.exports = {
         'hostname',
         'url',
         'referrer',
-        'language',
-        'screen'
+        'platform',
+        'screen',
+        'language'
     ],
     additionalProperties: false
 }

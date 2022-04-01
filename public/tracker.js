@@ -81,10 +81,13 @@
     req.send(JSON.stringify({ ...data, serverSide }));
   };
 
+  const platform = navigator.platform;
+
   // @TODO check cache payload
   const getPayload = () => ({
     website,
     hostname,
+    platform,
     screen,
     language,
     // cache: useCache && sessionStorage.getItem(cacheKey),

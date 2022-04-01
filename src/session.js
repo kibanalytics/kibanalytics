@@ -8,4 +8,9 @@ module.exports = session({
     store: new RedisStore({ client: redisClient }),
     saveUninitialized: true,
     resave: false,
+    cookie: {
+        secure: false,
+        httpOnly: true,
+        maxAge: 6.307e+11 // 20 years
+    }
 });
