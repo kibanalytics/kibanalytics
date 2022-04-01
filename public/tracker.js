@@ -69,6 +69,7 @@
     const req = new XMLHttpRequest();
     req.open('POST', url, true);
     req.setRequestHeader('Content-Type', 'application/json');
+    req.withCredentials = true; // Send cookies
 
     req.onreadystatechange = () => {
       if (req.readyState === 4) {
@@ -237,3 +238,19 @@
     update();
   }
 })(window);
+
+/*
+let boe = document.getElementsByTagName('body')[0], ade;
+if (boe) {
+    ade = document.createElement('div');
+    ade.setAttribute('class', "ads ad adsbox doubleclick ad-placement carbon-ads");
+    ade.setAttribute('style', "height:1px;width:1px;position: absolute;left:-999px;top:-999px;");
+    ade.textContent = "&nbsp;";
+    boe.appendChild(ade);
+}
+
+console.log({
+    "adblock": ade.offsetHeight === 0 ? 1 : 0,
+    "cookies": (navigator && navigator.cookieEnabled) || !!document.cookie ? 1 : 0
+});
+ */
