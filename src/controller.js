@@ -24,7 +24,7 @@ module.exports.collect = async (req, res, next) => {
         };
 
         // @TODO rPush nested objects
-        await redisClient.rPush(process.env.TRACKING_KEY, data);
+        await redisClient.rPush(process.env.TRACKING_KEY, JSON.stringify(data));
         res.json({ status: 'success', uuid: data.uuid });
     } catch (err) {
         next(err);
