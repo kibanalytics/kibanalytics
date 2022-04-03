@@ -7,6 +7,8 @@
     "test": "jest"
   },
   "dependencies": {
+    "@sentry/node": "^6.19.3",
+    "@sentry/tracing": "^6.19.3",
     "ajv": "^8.11.0",
     "body-parser": "^1.19.2",
     "connect-redis": "^6.1.1",
