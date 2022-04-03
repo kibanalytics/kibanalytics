@@ -8,6 +8,8 @@ module.exports = {
         platform: { type: 'string' },
         screen: { type: 'string' },
         language: { type: 'string' },
+        adBlock: { type: 'boolean' },
+        cookies: { type: 'boolean' },
         cache: { type: 'string' }
     },
     required: [
@@ -17,7 +19,9 @@ module.exports = {
         'referrer',
         'platform',
         'screen',
-        'language'
+        'language',
+        'adBlock',
+        'cookies'
     ],
     additionalProperties: false
 }

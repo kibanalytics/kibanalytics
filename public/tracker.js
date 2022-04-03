@@ -77,19 +77,30 @@
       }
     };
 
-    console.log(data);
     req.send(JSON.stringify({ ...data, serverSide }));
   };
 
-  const platform = navigator.platform;
+  let ade;
+  const boe = document.getElementsByTagName('body')[0];
+  if (boe) {
+    ade = document.createElement('div');
+    ade.setAttribute('class', "ads ad adsbox doubleclick ad-placement carbon-ads");
+    ade.setAttribute('style', "height:1px;width:1px;position: absolute;left:-999px;top:-999px;");
+    ade.textContent = "&nbsp;";
+    boe.appendChild(ade);
+  }
 
   // @TODO check cache payload
+  // @TODO test adBlock
+  // @TODO test cookies
   const getPayload = () => ({
     website,
     hostname,
-    platform,
+    platform: navigator.platform,
     screen,
     language,
+    adBlock: !!ade && ade.offsetHeight === 0,
+    cookies: (navigator && navigator.cookieEnabled) || !!document.cookie,
     // cache: useCache && sessionStorage.getItem(cacheKey),
     url: currentUrl,
   });
@@ -241,19 +252,3 @@
     update();
   }
 })(window);
-
-/*
-let boe = document.getElementsByTagName('body')[0], ade;
-if (boe) {
-    ade = document.createElement('div');
-    ade.setAttribute('class', "ads ad adsbox doubleclick ad-placement carbon-ads");
-    ade.setAttribute('style', "height:1px;width:1px;position: absolute;left:-999px;top:-999px;");
-    ade.textContent = "&nbsp;";
-    boe.appendChild(ade);
-}
-
-console.log({
-    "adblock": ade.offsetHeight === 0 ? 1 : 0,
-    "cookies": (navigator && navigator.cookieEnabled) || !!document.cookie ? 1 : 0
-});
- */
