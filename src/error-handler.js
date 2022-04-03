@@ -9,8 +9,11 @@ module.exports = (err, req, res, next) => {
 
     switch (err.message) {
         default: {
+            const response = { status: 'error', message: 'Internal server error' };
+            if (process.env.SENTRY_DSN) response.error_id = res.sentry;
+
             res.status(500);
-            res.json({ status: 'error', message: 'Internal server error' });
+            res.json(response);
         }
     }
 }
