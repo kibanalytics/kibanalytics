@@ -4,7 +4,9 @@
   "description": "Analytics with ELK stack.",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
   },
   "dependencies": {
     "@sentry/node": "^6.19.3",
@@ -25,6 +27,7 @@
   "devDependencies": {
     "jest": "^27.5.1",
     "node-fetch": "^2.6.7",
-    "puppeteer": "^13.5.2"
+    "puppeteer": "^13.5.2",
+    "vuepress": "^2.0.0-beta.37"
   }
 }

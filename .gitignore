@@ -57,3 +57,7 @@ Thumbs.db
 __tests__/output
 elk/logstash/pipeline/tracker.conf
 .env
+node_modules
+.temp
+.cache
+package-lock.json
