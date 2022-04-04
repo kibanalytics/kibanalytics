@@ -1,7 +1,7 @@
 module.exports = {
     type: 'object',
     properties: {
-        website: { type: 'string' },
+        tracker_id: { type: 'string' },
         hostname: { type: 'string' },
         url: { type: 'string' },
         referrer: { type: 'string' },
@@ -9,11 +9,10 @@ module.exports = {
         screen: { type: 'string' },
         language: { type: 'string' },
         adBlock: { type: 'boolean' },
-        cookies: { type: 'boolean' },
-        cache: { type: 'string' }
+        cookies: { type: 'boolean' }
     },
     required: [
-        'website',
+        'tracker_id',
         'hostname',
         'url',
         'referrer',
