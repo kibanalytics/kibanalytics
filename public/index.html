@@ -3,20 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
-    <script src="tracker.js" data-server-side="{ metric1: true }" data-website-id="1"></script>
+    <script src="dist/tracker.js"
+            data-server-url="http://localhost:3000"
+            data-tracker-id="1"
+            data-metrics="">
+    </script>
 </head>
 <body>
 <header>
     <nav>
         <ul>
             <li><a href="index.html">Home</a></li>
-            <li><a href="page-1.html">Page 1</a></li>
+            <li><a class="kibanalytics--custom--anchor" href="page-1.html">Page 1</a></li>
             <li><a href="page-2.html">Page 2</a></li>
         </ul>
     </nav>
 </header>
 <main>
     <h1>Home</h1>
+    <button class="kibanalytics--click--button" onclick="console.log('click')">Click Event</button>
 </main>
 </body>
 </html>

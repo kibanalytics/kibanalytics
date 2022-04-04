@@ -3,8 +3,6 @@ module.exports = {
     properties: {
         foo: { type: 'string' }
     },
-    required: [
-        'foo'
-    ],
-    additionalProperties: false
+    required: [],
+    additionalProperties: true
 }
