@@ -2,6 +2,47 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./src/client/class-listener.client.js":
+/*!*********************************************!*\
+  !*** ./src/client/class-listener.client.js ***!
+  \*********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _utils_client__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils.client */ "./src/client/utils.client.js");
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((element, className, prefix, type, value, trackEventFn) => () => {
+    const classData = {
+        name: className,
+        prefix,
+        type,
+        value
+    };
+
+    const elementData = {
+        tagName: element.tagName
+    };
+
+    const customData = (0,_utils_client__WEBPACK_IMPORTED_MODULE_0__.getPrefixedAttributes)('data-kbs-', element);
+
+    const data = {
+        class: classData,
+        element: elementData,
+        ...customData
+    };
+
+    const options = {
+        sendBeacon: data.element.tagName === 'A'
+    };
+    return trackEventFn(type, data, options);
+});
+
+/***/ }),
+
 /***/ "./src/client/utils.client.js":
 /*!************************************!*\
   !*** ./src/client/utils.client.js ***!
@@ -13,6 +54,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "adBlockEnabled": () => (/* binding */ adBlockEnabled),
 /* harmony export */   "cookiesEnabled": () => (/* binding */ cookiesEnabled),
 /* harmony export */   "doNotTrack": () => (/* binding */ doNotTrack),
+/* harmony export */   "getPrefixedAttributes": () => (/* binding */ getPrefixedAttributes),
 /* harmony export */   "hook": () => (/* binding */ hook)
 /* harmony export */ });
 const hook = (_this, method, callback) => {
@@ -54,6 +96,18 @@ const adBlockEnabled = () => {
 }
 
 const cookiesEnabled = (navigator && navigator.cookieEnabled) || !!document.cookie;
+
+const getPrefixedAttributes = (attrPrefix, element) => {
+    return element
+        .getAttributeNames()
+        .reduce((acc, name) => {
+            if (name.startsWith(attrPrefix)) {
+                const attrName = name.replace(attrPrefix, '');
+                if (attrName) return { ...acc, [attrName]: element.getAttribute(name) }
+            }
+            return acc;
+        }, {});
+}
 
 
 
@@ -122,7 +176,9 @@ var __webpack_exports__ = {};
   !*** ./src/client/tracker.client.js ***!
   \**************************************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _utils_client_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils.client.js */ "./src/client/utils.client.js");
+/* harmony import */ var _class_listener_client__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./class-listener.client */ "./src/client/class-listener.client.js");
+/* harmony import */ var _utils_client_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils.client.js */ "./src/client/utils.client.js");
+
 
 
 (window => {
@@ -145,10 +201,10 @@ __webpack_require__.r(__webpack_exports__);
     const serverUrl = attr('data-server-url');
     if (!serverUrl) throw new Error('data-server-url not found');
 
-    const metrics = attr('data-metrics') ? JSON.parse(attr('data-metrics')) : {};
+    const metrics = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.getPrefixedAttributes)('data-metrics-', script);
 
-    const eventClass = /^kibanalytics--([a-z]+)--([\w]+[\w-]*)$/;
-    const eventSelector = '[class*=\'kibanalytics--\']';
+    const eventClass = /^kbs-([a-z]+)-([\w]+[\w-]*)$/;
+    const eventSelector = '[class*=\'kbs-\']';
     const listeners = {};
     let currentUrl = `${pathname}${search}`;
     let currentRef = document.referrer;
@@ -167,12 +223,12 @@ __webpack_require__.r(__webpack_exports__);
         platform,
         screen: `${screen.width}x${screen.height}`,
         language,
-        adBlock: (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_0__.adBlockEnabled)(),
-        cookies: _utils_client_js__WEBPACK_IMPORTED_MODULE_0__.cookiesEnabled
+        adBlock: (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.adBlockEnabled)(),
+        cookies: _utils_client_js__WEBPACK_IMPORTED_MODULE_1__.cookiesEnabled
     });
 
     const collect = (type, payload, sendBeacon = false) => {
-        if ((0,_utils_client_js__WEBPACK_IMPORTED_MODULE_0__.doNotTrack)()) return;
+        if ((0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.doNotTrack)()) return;
 
         const url = `${serverUrl}/collect`;
         const body = {
@@ -188,7 +244,9 @@ __webpack_require__.r(__webpack_exports__);
                 the browser may be about to unload the page, and in that case the browser may choose not to send
                 asynchronous XMLHttpRequest requests.
              */
-            return navigator.sendBeacon(url, JSON.stringify(body));
+
+            const blob = new Blob([JSON.stringify(body)], { type : 'application/json' });
+            return navigator.sendBeacon(url, blob);
         }
 
         return fetch(url, {
@@ -201,14 +259,12 @@ __webpack_require__.r(__webpack_exports__);
         });
     };
 
-    const trackEvent = (type = 'custom', data = {}, element = null) => {
-        const sendBeacon = element ? element.tagName === 'A' : false;
-
-        const payload = (type === 'page-view' && !element)
+    const trackEvent = (type = 'custom', data = {}, options = {}) => {
+        const payload = (type === 'page-view')
             ? getPageViewPayload()
             : { ...getDefaultPayload(), data };
 
-        collect(type, payload, sendBeacon);
+        collect(type, payload, options.sendBeacon);
     };
 
     /* Handle events */
@@ -223,14 +279,10 @@ __webpack_require__.r(__webpack_exports__);
         for (const className of classes) {
             if (!eventClass.test(className)) continue;
 
-            const [prefix, type, value] = className.split('--');
-            let listener = listeners[className];
-            if (!listener) {
-                listener = listeners[className] ? listeners[className] : () => trackEvent(type, value, element);
-                listeners[className] = listener
-            }
+            const [prefix, type, value] = className.split('-');
+            listeners[className] = listeners[className] || (0,_class_listener_client__WEBPACK_IMPORTED_MODULE_0__["default"])(element, className, prefix, type, value, trackEvent);
 
-            element.addEventListener(type, listener, true);
+            element.addEventListener(type, listeners[className], true);
         }
     };
 
@@ -249,7 +301,7 @@ __webpack_require__.r(__webpack_exports__);
         }
 
         if (currentUrl !== currentRef) {
-            trackEvent('pageView');
+            trackEvent('page-view');
         }
     };
 
@@ -268,17 +320,17 @@ __webpack_require__.r(__webpack_exports__);
 
     /* Global */
 
-    if (!window.kibanalytics) {
-        window.kibanalytics = {
+    if (!window.kbs) {
+        window.kbs = {
             trackEvent
         };
     }
 
     /* Start */
 
-    if (!(0,_utils_client_js__WEBPACK_IMPORTED_MODULE_0__.doNotTrack)()) {
-        history.pushState = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_0__.hook)(history, 'pushState', handlePush);
-        history.replaceState = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_0__.hook)(history, 'replaceState', handlePush);
+    if (!(0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.doNotTrack)()) {
+        history.pushState = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.hook)(history, 'pushState', handlePush);
+        history.replaceState = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.hook)(history, 'replaceState', handlePush);
 
         const update = () => {
             if (document.readyState === 'complete') {

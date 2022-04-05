@@ -8,7 +8,11 @@ const validateCollectEndpoint = validator.getSchema('collectEndpoint');
 module.exports.collect = async (req, res, next) => {
     try {
         if (!validateCollectEndpoint(req.body)) {
-            res.status(422).json({ status: 'error', message: 'Schema validation error', errors: validateCollectEndpoint.errors });
+            res.status(422).json({
+                status: 'error',
+                message: 'Schema validation error',
+                errors: validateCollectEndpoint.errors
+            });
             return;
         }
 
@@ -17,7 +21,7 @@ module.exports.collect = async (req, res, next) => {
         if (!!+process.env.VALIDATE_JSON_SCHEMA) {
             const validate = validator.getSchema(eventType);
 
-            if (!validate) {
+            if (validate === undefined) {
                 res.status(422).json({ status: 'error', message: `Schema '${eventType}' not found` });
                 return;
             }
@@ -33,8 +37,8 @@ module.exports.collect = async (req, res, next) => {
         }
 
         const data = {
+            _id: uuidv4(),
             event: {
-                _id: uuidv4(),
                 type: req.body.type,
                 payload: req.body.payload
             },
@@ -44,7 +48,7 @@ module.exports.collect = async (req, res, next) => {
                 previousUrl: req.session.previousUrl
             },
             userAgent: uaParser(req.headers['user-agent']),
-            metrics: getServerMetric(req)
+            metrics: getServerMetric(req, req.body.metrics)
         };
 
         if (eventType === 'page-view') {
@@ -53,7 +57,7 @@ module.exports.collect = async (req, res, next) => {
         }
 
         await redisClient.rPush(process.env.TRACKING_KEY, JSON.stringify(data));
-        res.json({ status: 'success', eventId: data.event._id });
+        res.json({ status: 'success', _id: data._id });
     } catch (err) {
         next(err);
     }

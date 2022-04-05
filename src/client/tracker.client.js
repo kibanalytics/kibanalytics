@@ -1,4 +1,5 @@
-import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client.js';
+import classListener from './class-listener.client';
+import { adBlockEnabled, cookiesEnabled, doNotTrack, hook, getPrefixedAttributes } from './utils.client.js';
 
 (window => {
     const {
@@ -20,10 +21,10 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
     const serverUrl = attr('data-server-url');
     if (!serverUrl) throw new Error('data-server-url not found');
 
-    const metrics = attr('data-metrics') ? JSON.parse(attr('data-metrics')) : {};
+    const metrics = getPrefixedAttributes('data-metrics-', script);
 
-    const eventClass = /^kibanalytics--([a-z]+)--([\w]+[\w-]*)$/;
-    const eventSelector = '[class*=\'kibanalytics--\']';
+    const eventClass = /^kbs-([a-z]+)-([\w]+[\w-]*)$/;
+    const eventSelector = '[class*=\'kbs-\']';
     const listeners = {};
     let currentUrl = `${pathname}${search}`;
     let currentRef = document.referrer;
@@ -63,7 +64,9 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
                 the browser may be about to unload the page, and in that case the browser may choose not to send
                 asynchronous XMLHttpRequest requests.
              */
-            return navigator.sendBeacon(url, JSON.stringify(body));
+
+            const blob = new Blob([JSON.stringify(body)], { type : 'application/json' });
+            return navigator.sendBeacon(url, blob);
         }
 
         return fetch(url, {
@@ -76,14 +79,12 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
         });
     };
 
-    const trackEvent = (type = 'custom', data = {}, element = null) => {
-        const sendBeacon = element ? element.tagName === 'A' : false;
-
-        const payload = (type === 'page-view' && !element)
+    const trackEvent = (type = 'custom', data = {}, options = {}) => {
+        const payload = (type === 'page-view')
             ? getPageViewPayload()
             : { ...getDefaultPayload(), data };
 
-        collect(type, payload, sendBeacon);
+        collect(type, payload, options.sendBeacon);
     };
 
     /* Handle events */
@@ -98,14 +99,10 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
         for (const className of classes) {
             if (!eventClass.test(className)) continue;
 
-            const [prefix, type, value] = className.split('--');
-            let listener = listeners[className];
-            if (!listener) {
-                listener = listeners[className] ? listeners[className] : () => trackEvent(type, value, element);
-                listeners[className] = listener
-            }
+            const [prefix, type, value] = className.split('-');
+            listeners[className] = listeners[className] || classListener(element, className, prefix, type, value, trackEvent);
 
-            element.addEventListener(type, listener, true);
+            element.addEventListener(type, listeners[className], true);
         }
     };
 
@@ -124,7 +121,7 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
         }
 
         if (currentUrl !== currentRef) {
-            trackEvent('pageView');
+            trackEvent('page-view');
         }
     };
 
@@ -143,8 +140,8 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
 
     /* Global */
 
-    if (!window.kibanalytics) {
-        window.kibanalytics = {
+    if (!window.kbs) {
+        window.kbs = {
             trackEvent
         };
     }

@@ -4,24 +4,53 @@
     <meta charset="UTF-8">
     <title>Home</title>
     <script src="dist/tracker.js"
+            data-tracker-id="N7TXY7"
             data-server-url="http://localhost:3000"
-            data-tracker-id="1"
-            data-metrics="">
+            data-metrics-foo="bar">
+    </script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            const buttonEl = document.getElementById('programmaticallyCall');
+            buttonEl.addEventListener('click', () => {
+                const { kbs } = window;
+
+                const data = {
+                    foo: 'bar'
+                };
+                kbs.trackEvent('custom', data);
+
+                console.log('Programmatically Call');
+            });
+        });
     </script>
 </head>
 <body>
 <header>
     <nav>
         <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a class="kibanalytics--custom--anchor" href="page-1.html">Page 1</a></li>
-            <li><a href="page-2.html">Page 2</a></li>
+            <li><a href="index.html">Home (page-view)</a></li>
+            <li><a class="kbs-click-anchor01" href="page-1.html">Page 1 (page-view & click event)</a></li>
         </ul>
     </nav>
 </header>
 <main>
     <h1>Home</h1>
-    <button class="kibanalytics--click--button" onclick="console.log('click')">Click Event</button>
+    <div>
+        <button class="kbs-click-button01"
+                onclick="console.log('Click Event')">
+            Click Event
+        </button>
+        <button class="kbs-click-button02"
+                data-kbs-foo="bar"
+                onclick="console.log('Click Event (Custom Data)')">
+            Click Event (Custom Data)
+        </button>
+    </div>
+    <div style="margin-top: 24px">
+        <button id="programmaticallyCall">
+            Programmatically Call
+        </button>
+    </div>
 </main>
 </body>
 </html>
