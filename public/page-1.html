@@ -4,18 +4,17 @@
     <meta charset="UTF-8">
     <title>Page 1</title>
     <script src="dist/tracker.js"
+            data-tracker-id="N7TXY7"
             data-server-url="http://localhost:3000"
-            data-tracker-id="1"
-            data-metrics="">
+            data-metrics-foo="bar">
     </script>
 </head>
 <body>
 <header>
     <nav>
         <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="page-1.html">Page 1</a></li>
-            <li><a href="page-2.html">Page 2</a></li>
+            <li><a href="index.html">Home (page-view)</a></li>
+            <li><a class="kbs-click-anchor01" href="page-1.html">Page 1 (page-view & click event)</a></li>
         </ul>
     </nav>
 </header>

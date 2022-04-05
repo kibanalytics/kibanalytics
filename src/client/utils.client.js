@@ -38,9 +38,22 @@ const adBlockEnabled = () => {
 
 const cookiesEnabled = (navigator && navigator.cookieEnabled) || !!document.cookie;
 
+const getPrefixedAttributes = (attrPrefix, element) => {
+    return element
+        .getAttributeNames()
+        .reduce((acc, name) => {
+            if (name.startsWith(attrPrefix)) {
+                const attrName = name.replace(attrPrefix, '');
+                if (attrName) return { ...acc, [attrName]: element.getAttribute(name) }
+            }
+            return acc;
+        }, {});
+}
+
 export {
     hook,
     doNotTrack,
     adBlockEnabled,
-    cookiesEnabled
+    cookiesEnabled,
+    getPrefixedAttributes
 };
