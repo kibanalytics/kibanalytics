@@ -1,6 +1,6 @@
 const { lookup } = require('geoip-lite');
 
-module.exports = (req) => {
+module.exports.ip = (req) => {
     /*
         geoip-lite includes the GeoLite database from MaxMind. This database is not the most accurate database
         available, however it is the best available for free. You can use the commercial GeoIP database from
@@ -23,7 +23,5 @@ module.exports = (req) => {
      */
     if (process.env.NODE_ENV === 'development') ip.address = '177.170.250.182';
 
-    return {
-        ip
-    };
+    return ip;
 }

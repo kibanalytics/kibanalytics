@@ -1,3 +1,5 @@
+'use strict';
+
 const hook = (_this, method, callback) => {
     const orig = _this[method];
 
@@ -50,10 +52,21 @@ const getPrefixedAttributes = (attrPrefix, element) => {
         }, {});
 }
 
+const isJsonString = (str) => {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        console.warn('Invalid JSON string', str);
+        return false;
+    }
+    return true;
+}
+
 export {
     hook,
     doNotTrack,
     adBlockEnabled,
     cookiesEnabled,
-    getPrefixedAttributes
+    getPrefixedAttributes,
+    isJsonString
 };
