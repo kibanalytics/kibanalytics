@@ -37,8 +37,8 @@ module.exports.collect = async (req, res, next) => {
         }
 
         const data = {
-            _id: uuidv4(),
             event: {
+                _id: uuidv4(),
                 type: req.body.type,
                 payload: req.body.payload
             },
@@ -57,7 +57,7 @@ module.exports.collect = async (req, res, next) => {
         }
 
         await redisClient.rPush(process.env.TRACKING_KEY, JSON.stringify(data));
-        res.json({ status: 'success', _id: data._id });
+        res.json({ status: 'success', _id: data.event._id });
     } catch (err) {
         next(err);
     }
