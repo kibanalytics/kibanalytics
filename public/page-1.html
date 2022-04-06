@@ -5,8 +5,11 @@
     <title>Page 1</title>
     <script src="dist/tracker.js"
             data-tracker-id="N7TXY7"
-            data-server-url="http://localhost:3000"
-            data-metrics-foo="bar">
+            data-server-url="http://localhost:3000">
+    </script>
+    <script>
+        kbs.serverSideData = { foo: 'bar' };
+        console.log('serverSideData', kbs.serverSideData);
     </script>
 </head>
 <body>

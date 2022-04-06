@@ -15,6 +15,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_client__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils.client */ "./src/client/utils.client.js");
 
 
+
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((element, className, prefix, type, value, trackEventFn) => () => {
     const classData = {
         name: className,
@@ -55,8 +57,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "cookiesEnabled": () => (/* binding */ cookiesEnabled),
 /* harmony export */   "doNotTrack": () => (/* binding */ doNotTrack),
 /* harmony export */   "getPrefixedAttributes": () => (/* binding */ getPrefixedAttributes),
-/* harmony export */   "hook": () => (/* binding */ hook)
+/* harmony export */   "hook": () => (/* binding */ hook),
+/* harmony export */   "isJsonString": () => (/* binding */ isJsonString)
 /* harmony export */ });
+
+
 const hook = (_this, method, callback) => {
     const orig = _this[method];
 
@@ -107,6 +112,16 @@ const getPrefixedAttributes = (attrPrefix, element) => {
             }
             return acc;
         }, {});
+}
+
+const isJsonString = (str) => {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        console.warn('Invalid JSON string', str);
+        return false;
+    }
+    return true;
 }
 
 
@@ -181,6 +196,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+
 (window => {
     const {
         screen,
@@ -190,24 +207,22 @@ __webpack_require__.r(__webpack_exports__);
         history,
     } = window;
 
-    const script = document.querySelector('script');
-    if (!script) return;
+    const script = document.querySelector('script[data-tracker-id]');
+    if (!script) throw new Error('data-tracker-id not found');
 
     const attr = script.getAttribute.bind(script);
-
     const tracker_id = attr('data-tracker-id');
-    if (!tracker_id) throw new Error('data-tracker-id not found');
-
     const serverUrl = attr('data-server-url');
-    if (!serverUrl) throw new Error('data-server-url not found');
 
-    const metrics = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.getPrefixedAttributes)('data-metrics-', script);
+    if (!serverUrl) throw new Error('data-server-url not found');
 
     const eventClass = /^kbs-([a-z]+)-([\w]+[\w-]*)$/;
     const eventSelector = '[class*=\'kbs-\']';
     const listeners = {};
     let currentUrl = `${pathname}${search}`;
     let currentRef = document.referrer;
+    let callback = null;
+    let serverSideData = {};
 
     /* Collect metrics */
 
@@ -218,7 +233,6 @@ __webpack_require__.r(__webpack_exports__);
     });
 
     const getPageViewPayload = () => ({
-        ...getDefaultPayload(),
         referrer: currentRef,
         platform,
         screen: `${screen.width}x${screen.height}`,
@@ -227,13 +241,16 @@ __webpack_require__.r(__webpack_exports__);
         cookies: _utils_client_js__WEBPACK_IMPORTED_MODULE_1__.cookiesEnabled
     });
 
-    const collect = (type, payload, sendBeacon = false) => {
+    const collect = async (type, payload, sendBeacon = false) => {
         if ((0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.doNotTrack)()) return;
 
         const url = `${serverUrl}/collect`;
         const body = {
+            tracker_id,
+            hostname,
+            url: currentUrl,
             type,
-            metrics,
+            serverSide: serverSideData,
             payload
         }
 
@@ -245,26 +262,40 @@ __webpack_require__.r(__webpack_exports__);
                 asynchronous XMLHttpRequest requests.
              */
 
-            const blob = new Blob([JSON.stringify(body)], { type : 'application/json' });
-            return navigator.sendBeacon(url, blob);
+            const blob = new Blob([JSON.stringify(body)], { type: 'application/json' });
+            const queued = navigator.sendBeacon(url, blob);
+
+            /*
+                The sendBeacon() method returns true if the user agent successfully queued the data for transfer.
+                Otherwise, it returns false.
+             */
+
+            return (queued)
+                ? { status: 'success', event_id: 'sendBeacon' }
+                : { status: 'error', message: 'User agent failed to queue the data transfer' };
         }
 
-        return fetch(url, {
+        const response = await fetch(url, {
             method: 'post',
             headers: {
                 'content-type': 'application/json'
             },
             body: JSON.stringify(body),
             credentials: 'include'
-        });
+        }).then(response => response.json());
+
+        return response
     };
 
-    const trackEvent = (type = 'custom', data = {}, options = {}) => {
+    const trackEvent = async (type = 'custom', data = {}, options = {}) => {
         const payload = (type === 'page-view')
             ? getPageViewPayload()
-            : { ...getDefaultPayload(), data };
+            : data;
 
-        collect(type, payload, options.sendBeacon);
+        const response = await collect(type, payload, options.sendBeacon);
+
+        if (callback) callback(response);
+        return response;
     };
 
     /* Handle events */
@@ -320,10 +351,26 @@ __webpack_require__.r(__webpack_exports__);
 
     /* Global */
 
+    const kbs = {
+        get serverSideData() {
+            return serverSideData
+        },
+        set serverSideData(obj) {
+            if (typeof obj === 'object') serverSideData = obj;
+        },
+        get callback() {
+            return callback;
+        },
+        set callback(fn) {
+            if (typeof fn === 'function') callback = fn;
+            return callback;
+        },
+        trackEvent
+    };
+    Object.freeze(kbs);
+
     if (!window.kbs) {
-        window.kbs = {
-            trackEvent
-        };
+        window.kbs = kbs;
     }
 
     /* Start */

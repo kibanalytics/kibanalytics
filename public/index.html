@@ -5,21 +5,26 @@
     <title>Home</title>
     <script src="dist/tracker.js"
             data-tracker-id="N7TXY7"
-            data-server-url="http://localhost:3000"
-            data-metrics-foo="bar">
+            data-server-url="http://localhost:3000">
+    </script>
+    <script>
+        kbs.serverSideData = { foo: 'bar' };
+        kbs.callback = (response) => {
+            console.log('callback', response);
+        }
+        console.log('serverSideData', kbs.serverSideData);
     </script>
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', () => {
             const buttonEl = document.getElementById('programmaticallyCall');
-            buttonEl.addEventListener('click', () => {
+            buttonEl.addEventListener('click', async () => {
                 const { kbs } = window;
 
                 const data = {
                     foo: 'bar'
                 };
-                kbs.trackEvent('custom', data);
-
-                console.log('Programmatically Call');
+                const response = await kbs.trackEvent('custom', data);
+                console.log('Programmatically Call', response);
             });
         });
     </script>

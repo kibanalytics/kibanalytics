@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 const redisClient = require('./redis-client');
 const validator = require('./validator');
 const uaParser = require('ua-parser-js');
-const getServerMetric = require('./server-metrics');
+const metrics = require('./metrics');
 const validateCollectEndpoint = validator.getSchema('collectEndpoint');
 
 module.exports.collect = async (req, res, next) => {
@@ -48,7 +48,8 @@ module.exports.collect = async (req, res, next) => {
                 previousUrl: req.session.previousUrl
             },
             userAgent: uaParser(req.headers['user-agent']),
-            metrics: getServerMetric(req, req.body.metrics)
+            ip: metrics.ip(req),
+            serverSide: req.body.serverSide || {}
         };
 
         if (eventType === 'page-view') {
@@ -57,7 +58,7 @@ module.exports.collect = async (req, res, next) => {
         }
 
         await redisClient.rPush(process.env.TRACKING_KEY, JSON.stringify(data));
-        res.json({ status: 'success', _id: data.event._id });
+        res.json({ status: 'success', event_id: data.event._id });
     } catch (err) {
         next(err);
     }

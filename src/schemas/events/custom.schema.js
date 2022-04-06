@@ -4,5 +4,5 @@ module.exports = {
         foo: { type: 'string' }
     },
     required: [],
-    additionalProperties: true
+    additionalProperties: false
 }

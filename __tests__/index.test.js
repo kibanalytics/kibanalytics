@@ -5,6 +5,7 @@ const { writeFile } = require('fs/promises');
 const path = require('path');
 const puppeteer = require('puppeteer');
 const fetch = require('node-fetch');
+const { Client } = require('@elastic/elasticsearch')
 
 const OUTPUT_DIR_PATH = path.join(process.cwd(), '__tests__', 'output');
 const BROWSER_HEADLESS = true;
@@ -54,6 +55,25 @@ describe('Collect Controller', () => {
     };
     const customSchemaBody = { type: 'custom', payload: { foo: 'bar' } };
     const allowedOrigins = process.env.EXPRESS_ALLOWED_ORIGINS.split(',');
+
+    test('Test', async () => {
+        const client = new Client({ node: 'http://localhost:9200' });
+
+        const document = await client.search({
+            index: 'tracker-*',
+            body: {
+                query: {
+                    bool: {
+                        must: {
+                            term: {
+                                'event._id.keyword': '8a8a0324-9dac-4bac-8f7a-81bf2f7f9a67'
+                            }
+                        }
+                    }
+                }
+            }
+        }).then(response => response?.hits?.hits[0]);
+    });
 
     test(`Allowed Origin (${CORS_ALLOWED_ORIGIN})`, async () => {
         if (!process.env.EXPRESS_CORS || process.env.EXPRESS_CORS.toLowerCase() === 'false') {

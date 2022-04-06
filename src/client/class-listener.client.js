@@ -1,3 +1,5 @@
+'use strict';
+
 import { getPrefixedAttributes } from './utils.client';
 
 export default (element, className, prefix, type, value, trackEventFn) => () => {

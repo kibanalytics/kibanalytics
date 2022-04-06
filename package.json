@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "dev": "webpack --env=development",
+    "build": "webpack --env=production",
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs"
   },
@@ -12,6 +14,7 @@
     "@sentry/node": "^6.19.3",
     "@sentry/tracing": "^6.19.3",
     "ajv": "^8.11.0",
+    "ajv-keywords": "^5.1.0",
     "body-parser": "^1.19.2",
     "connect-redis": "^6.1.1",
     "cors": "^2.8.5",
@@ -26,9 +29,15 @@
     "winston": "^3.6.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.17.8",
+    "@babel/preset-env": "^7.16.11",
+    "@elastic/elasticsearch": "^8.1.0",
+    "babel-loader": "^8.2.4",
     "jest": "^27.5.1",
     "node-fetch": "^2.6.7",
     "puppeteer": "^13.5.2",
-    "vuepress": "^2.0.0-beta.37"
+    "vuepress": "^2.0.0-beta.37",
+    "webpack": "^5.71.0",
+    "webpack-cli": "^4.9.2"
   }
 }
