@@ -2,9 +2,55 @@ module.exports = {
     type: 'object',
     properties: {
         tracker_id: { type: 'string' },
-        hostname: { type: 'string' },
-        url: { type: 'string' },
-        type: { type: 'string' },
+        url: {
+            type: 'object',
+            properties: {
+                href: { type: 'string' },
+                referrer: { type: 'string' }
+            },
+            required: ['href'],
+            additionalProperties: false
+        },
+        event: {
+            type: 'object',
+            properties: {
+                type: { type: 'string' },
+                payload: { typeof: 'object' }
+            },
+            required: ['type'],
+            additionalProperties: false
+        },
+        device: {
+            type: 'object',
+            properties: {
+                platform: { type: 'string' },
+                screen: {
+                    type: 'object',
+                    properties: {
+                        width: { type: 'number' },
+                        height: { type: 'number' }
+                    },
+                    required: ['width', 'height'],
+                    additionalProperties: false
+                },
+            },
+            required: [],
+            additionalProperties: false
+        },
+        browser: {
+            type: 'object',
+            properties: {
+                language: { type: 'string' },
+                adBlock: { type: 'boolean' },
+                cookies: { type: 'boolean' }
+            },
+            required: [
+                'language',
+                'adBlock',
+                'cookies'
+            ],
+            additionalProperties: false
+        },
         serverSide: {
             type: 'object',
             properties: {
@@ -12,16 +58,15 @@ module.exports = {
             },
             required: [],
             additionalProperties: false
-        },
-        payload: { typeof: 'object' },
+        }
     },
     required: [
         'tracker_id',
-        'hostname',
         'url',
-        'type',
-        'serverSide',
-        'payload'
+        'event',
+        'device',
+        'browser',
+        'serverSide'
     ],
     additionalProperties: false
 }

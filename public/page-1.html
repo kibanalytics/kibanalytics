@@ -9,6 +9,9 @@
     </script>
     <script>
         kbs.serverSideData = { foo: 'bar' };
+        kbs.callback = (response) => {
+            console.log('callback', response);
+        }
         console.log('serverSideData', kbs.serverSideData);
     </script>
 </head>
@@ -17,7 +20,7 @@
     <nav>
         <ul>
             <li><a href="index.html">Home (page-view)</a></li>
-            <li><a class="kbs-click-anchor01" href="page-1.html">Page 1 (page-view & click event)</a></li>
+            <li><a href="page-1.html">Page 1 (page-view)</a></li>
         </ul>
     </nav>
 </header>

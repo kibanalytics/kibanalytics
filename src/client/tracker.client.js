@@ -7,7 +7,7 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
     const {
         screen,
         navigator: { language, platform },
-        location: { hostname, pathname, search },
+        location,
         document,
         history,
     } = window;
@@ -24,27 +24,12 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
     const eventClass = /^kbs-([a-z]+)-([\w]+[\w-]*)$/;
     const eventSelector = '[class*=\'kbs-\']';
     const listeners = {};
-    let currentUrl = `${pathname}${search}`;
+    let currentUrl = location.href;
     let currentRef = document.referrer;
     let callback = null;
     let serverSideData = {};
 
     /* Collect metrics */
-
-    const getDefaultPayload = () => ({
-        tracker_id,
-        hostname,
-        url: currentUrl
-    });
-
-    const getPageViewPayload = () => ({
-        referrer: currentRef,
-        platform,
-        screen: `${screen.width}x${screen.height}`,
-        language,
-        adBlock: adBlockEnabled(),
-        cookies: cookiesEnabled
-    });
 
     const collect = async (type, payload, sendBeacon = false) => {
         if (doNotTrack()) return;
@@ -52,11 +37,27 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
         const url = `${serverUrl}/collect`;
         const body = {
             tracker_id,
-            hostname,
-            url: currentUrl,
-            type,
-            serverSide: serverSideData,
-            payload
+            url: {
+                href: currentUrl,
+                referrer: currentRef
+            },
+            event: {
+                type,
+                payload
+            },
+            device: {
+                platform,
+                screen: {
+                    width: screen.width,
+                    height: screen.height
+                }
+            },
+            browser: {
+                language,
+                adBlock: adBlockEnabled(),
+                cookies: cookiesEnabled
+            },
+            serverSide: serverSideData
         }
 
         if (sendBeacon) {
@@ -80,7 +81,7 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
                 : { status: 'error', message: 'User agent failed to queue the data transfer' };
         }
 
-        const response = await fetch(url, {
+        return await fetch(url, {
             method: 'post',
             headers: {
                 'content-type': 'application/json'
@@ -88,16 +89,10 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
             body: JSON.stringify(body),
             credentials: 'include'
         }).then(response => response.json());
-
-        return response
     };
 
     const trackEvent = async (type = 'custom', data = {}, options = {}) => {
-        const payload = (type === 'page-view')
-            ? getPageViewPayload()
-            : data;
-
-        const response = await collect(type, payload, options.sendBeacon);
+        const response = await collect(type, data, options.sendBeacon);
 
         if (callback) callback(response);
         return response;
@@ -112,6 +107,8 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
 
     const addEvent = element => {
         const classes = element.getAttribute('class')?.split(' ');
+        if (!classes) return;
+
         for (const className of classes) {
             if (!eventClass.test(className)) continue;
 
@@ -128,13 +125,7 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
         if (!url) return;
 
         currentRef = currentUrl;
-        const newUrl = url.toString();
-
-        if (newUrl.substring(0, 4) === 'http') {
-            currentUrl = '/' + newUrl.split('/').splice(3).join('/');
-        } else {
-            currentUrl = newUrl;
-        }
+        currentUrl = location.href;
 
         if (currentUrl !== currentRef) {
             trackEvent('page-view');
@@ -153,6 +144,9 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
         const observer = new MutationObserver(monitorMutate);
         observer.observe(document, { childList: true, subtree: true });
     };
+
+    // @TODO Referal Host
+    // @TODO new user or not
 
     /* Global */
 
