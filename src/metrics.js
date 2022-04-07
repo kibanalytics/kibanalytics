@@ -7,21 +7,22 @@ module.exports.ip = (req) => {
         MaxMind with better accuracy by buying a license from MaxMind, and then using the conversion utility to
         convert it to a format that geoip-lite understands. You will need to use the .csv files from MaxMind
         for conversion.
+
+        If running in a local machine, you will not be able to get the location data. To test it out,
+        just hardcode your IP address in the ip variable.
      */
 
-    const address = req.headers['x-forwarded-for'] || req.connection.remoteAddress
+    // @TODO behind cloudflare or not flag
+
+    const address = process.env.NODE_ENV === 'development'
+        ? '177.170.250.182'
+        : req.headers['x-forwarded-for'] || req.connection.remoteAddress
     const ipData = lookup(address) || {};
 
     const ip = {
         address,
         ...ipData
     }
-
-    /*
-        If you are running in a local machine, you will not be able to get the location data. To test it out,
-        just hardcode your IP address in the ip variable.
-     */
-    if (process.env.NODE_ENV === 'development') ip.address = '177.170.250.182';
 
     return ip;
 }

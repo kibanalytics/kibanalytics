@@ -16,9 +16,9 @@ module.exports.collect = async (req, res, next) => {
             return;
         }
 
-        const eventType = req.body.type;
+        const eventType = req.body.event.type;
 
-        if (!!+process.env.VALIDATE_JSON_SCHEMA) {
+        if (!!+process.env.VALIDATE_JSON_SCHEMA && eventType !== 'page-view') {
             const validate = validator.getSchema(eventType);
 
             if (validate === undefined) {
@@ -26,7 +26,7 @@ module.exports.collect = async (req, res, next) => {
                 return;
             }
 
-            if (!validate(req.body.payload)) {
+            if (!validate(req.body.event?.payload)) {
                 res.status(422).json({ status: 'error', message: 'Schema validation error', errors: validate.errors });
                 return;
             }
@@ -36,26 +36,44 @@ module.exports.collect = async (req, res, next) => {
             (req.session.views) ? req.session.views++ : req.session.views = 1;
         }
 
+        // @TODO time delta between events, last page it was
+
+        const url = new URL(req.body.url.href);
+        const parsedUserAgent = uaParser(req.headers['user-agent']);
+
         const data = {
+            tracker_id: req.body.tracker_id,
+            url: {
+                hostname: url.hostname,
+                pathname: url.pathname,
+                search: url.search,
+                hash: url.hash,
+                ...req.body.url
+            },
             event: {
                 _id: uuidv4(),
-                type: req.body.type,
-                payload: req.body.payload
+                type: req.body.event.type,
+                payload: eventType !== 'page-view' ? req.body.event.payload : {}
             },
+            device: {
+                os: parsedUserAgent.os,
+                cpu: parsedUserAgent.cpu,
+                ...parsedUserAgent.device,
+                ...req.body.device
+            },
+            browser: {
+                engine: parsedUserAgent.engine,
+                ...parsedUserAgent.browser,
+                ...req.body.browser
+            },
+            userAgent: req.headers['user-agent'],
             session: {
                 _id: req.session.id,
-                views: req.session.views,
-                previousUrl: req.session.previousUrl
+                views: req.session.views
             },
-            userAgent: uaParser(req.headers['user-agent']),
             ip: metrics.ip(req),
-            serverSide: req.body.serverSide || {}
+            serverSide: req.body.serverSide
         };
-
-        if (eventType === 'page-view') {
-            req.session.ts = new Date();
-            req.session.previousUrl = req.body.payload.url;
-        }
 
         await redisClient.rPush(process.env.TRACKING_KEY, JSON.stringify(data));
         res.json({ status: 'success', event_id: data.event._id });

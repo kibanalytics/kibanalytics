@@ -202,7 +202,7 @@ __webpack_require__.r(__webpack_exports__);
     const {
         screen,
         navigator: { language, platform },
-        location: { hostname, pathname, search },
+        location,
         document,
         history,
     } = window;
@@ -219,27 +219,12 @@ __webpack_require__.r(__webpack_exports__);
     const eventClass = /^kbs-([a-z]+)-([\w]+[\w-]*)$/;
     const eventSelector = '[class*=\'kbs-\']';
     const listeners = {};
-    let currentUrl = `${pathname}${search}`;
+    let currentUrl = location.href;
     let currentRef = document.referrer;
     let callback = null;
     let serverSideData = {};
 
     /* Collect metrics */
-
-    const getDefaultPayload = () => ({
-        tracker_id,
-        hostname,
-        url: currentUrl
-    });
-
-    const getPageViewPayload = () => ({
-        referrer: currentRef,
-        platform,
-        screen: `${screen.width}x${screen.height}`,
-        language,
-        adBlock: (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.adBlockEnabled)(),
-        cookies: _utils_client_js__WEBPACK_IMPORTED_MODULE_1__.cookiesEnabled
-    });
 
     const collect = async (type, payload, sendBeacon = false) => {
         if ((0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.doNotTrack)()) return;
@@ -247,11 +232,27 @@ __webpack_require__.r(__webpack_exports__);
         const url = `${serverUrl}/collect`;
         const body = {
             tracker_id,
-            hostname,
-            url: currentUrl,
-            type,
-            serverSide: serverSideData,
-            payload
+            url: {
+                href: currentUrl,
+                referrer: currentRef
+            },
+            event: {
+                type,
+                payload
+            },
+            device: {
+                platform,
+                screen: {
+                    width: screen.width,
+                    height: screen.height
+                }
+            },
+            browser: {
+                language,
+                adBlock: (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.adBlockEnabled)(),
+                cookies: _utils_client_js__WEBPACK_IMPORTED_MODULE_1__.cookiesEnabled
+            },
+            serverSide: serverSideData
         }
 
         if (sendBeacon) {
@@ -275,7 +276,7 @@ __webpack_require__.r(__webpack_exports__);
                 : { status: 'error', message: 'User agent failed to queue the data transfer' };
         }
 
-        const response = await fetch(url, {
+        return await fetch(url, {
             method: 'post',
             headers: {
                 'content-type': 'application/json'
@@ -283,16 +284,10 @@ __webpack_require__.r(__webpack_exports__);
             body: JSON.stringify(body),
             credentials: 'include'
         }).then(response => response.json());
-
-        return response
     };
 
     const trackEvent = async (type = 'custom', data = {}, options = {}) => {
-        const payload = (type === 'page-view')
-            ? getPageViewPayload()
-            : data;
-
-        const response = await collect(type, payload, options.sendBeacon);
+        const response = await collect(type, data, options.sendBeacon);
 
         if (callback) callback(response);
         return response;
@@ -307,6 +302,8 @@ __webpack_require__.r(__webpack_exports__);
 
     const addEvent = element => {
         const classes = element.getAttribute('class')?.split(' ');
+        if (!classes) return;
+
         for (const className of classes) {
             if (!eventClass.test(className)) continue;
 
@@ -323,13 +320,7 @@ __webpack_require__.r(__webpack_exports__);
         if (!url) return;
 
         currentRef = currentUrl;
-        const newUrl = url.toString();
-
-        if (newUrl.substring(0, 4) === 'http') {
-            currentUrl = '/' + newUrl.split('/').splice(3).join('/');
-        } else {
-            currentUrl = newUrl;
-        }
+        currentUrl = location.href;
 
         if (currentUrl !== currentRef) {
             trackEvent('page-view');
@@ -348,6 +339,9 @@ __webpack_require__.r(__webpack_exports__);
         const observer = new MutationObserver(monitorMutate);
         observer.observe(document, { childList: true, subtree: true });
     };
+
+    // @TODO Referal Host
+    // @TODO new user or not
 
     /* Global */
 
