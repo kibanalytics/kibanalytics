@@ -12,6 +12,26 @@ services:
     ports:
       - "${REDIS_LISTEN:-127.0.0.1:6379:6379}"
 
+  node:
+    image: node:16
+    restart: unless-stopped
+    # environment:
+      # REDIS_URL:
+      # DIRECTUS_URL:
+      # DIRECTUS_TOKEN:
+      # PORT:
+      # REDIRECT_URL_IF_ERROR:
+      # CF_CLIENT_ID:
+      # CF_CLIENT_SECRET:
+    volumes:
+      - .:/app
+      - ./node_modules:/app/node_modules
+    working_dir: /app
+    command: node index.js
+    ports:
+      - ${NODE_LISTEN:-127.0.0.1:3000:3000}
+
+
 
   logstash:
     network_mode: host
