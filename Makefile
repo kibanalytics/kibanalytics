@@ -11,3 +11,9 @@ logstash-config: ## ## Generates a logastash config
 
 elk-start: logstash-config ## ## Alias for docker-compose up -d elasticsearch logstash kibana
 	docker-compose up -d elasticsearch logstash kibana
+
+
+update: ## ## Shortcut to update repository and restart app
+	docker-compose ps
+	git pull && npm i && docker-compose up -d node && docker-compose restart node
+	docker-compose ps
