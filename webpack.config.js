@@ -16,7 +16,7 @@ const dev = {
 const prod = {
     mode: 'production',
     devtool: false,
-    watch: false,
+    watch: true,
     entry: {
         'tracker.min': path.resolve(__dirname, 'src/client/tracker.client.js')
     },
@@ -28,7 +28,8 @@ const prod = {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: ['@babel/preset-env']
+                        presets: ['@babel/preset-env'],
+                        plugins: ['@babel/plugin-transform-runtime']
                     }
                 }
             }
