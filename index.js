@@ -59,29 +59,17 @@ const init = async () => {
          */
         app.use(helmet({
             referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-            crossOriginResourcePolicy: { policy: "cross-origin" }
+            crossOriginEmbedderPolicy: false,
+            crossOriginOpenerPolicy: false,
+            crossOriginResourcePolicy: false
         }));
     }
 
+    app.use(bodyParser.json());
+    app.use(express.static('public'));
     app.use(session);
 
-    if (process.env.NODE_ENV == 'development') {
-        app.use(express.static('public'));
-    } else {
-        app.get('/', (req, res) => {
-            res.redirect('https://kibanalytics.io')
-        })
-    }
-
-    app.use(bodyParser.json());
-
-
-    app.get('/' + (process.env.TRACKER_FILE_ALIAS ?? 'kbs.js'), function(req, res){
-        res.sendFile('dist/tracker.min.js', {root: './public'});
-    });
     app.post('/collect', controller.collect);
-
-
 
     app.use(Sentry.Handlers.errorHandler());
     app.use(errorHandler);
