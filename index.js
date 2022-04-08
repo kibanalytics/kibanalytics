@@ -66,7 +66,14 @@ const init = async () => {
     app.use(express.static('public'));
     app.use(bodyParser.json());
 
+
+    app.get('/' + (process.env.TRACKER_FILE_ALIAS ?? 'kbs.js'), function(req, res){
+        res.sendFile('dist/tracker.min.js', {root: './public'});
+    });
+
     app.post('/collect', controller.collect);
+
+
 
     app.use(Sentry.Handlers.errorHandler());
     app.use(errorHandler);
