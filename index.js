@@ -63,14 +63,17 @@ const init = async () => {
     }
 
     app.use(session);
-    app.use(express.static('public'));
+
+    if (process.env.NODE_ENV == 'development') {
+        app.use(express.static('public'));
+    }
+
     app.use(bodyParser.json());
 
 
     app.get('/' + (process.env.TRACKER_FILE_ALIAS ?? 'kbs.js'), function(req, res){
         res.sendFile('dist/tracker.min.js', {root: './public'});
     });
-
     app.post('/collect', controller.collect);
 
 
