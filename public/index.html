@@ -3,31 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
-    <script src="dist/tracker.js"
+    <script src="dist/tracker.min.js"
             data-tracker-id="N7TXY7"
             data-server-url="https://kibanalytics.virail.app">
     </script>
-    <script>
-        kbs.serverSideData = { foo: 'bar' };
-        kbs.callback = (response) => {
-            console.log('callback', response);
-        }
-        console.log('serverSideData', kbs.serverSideData);
-    </script>
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', () => {
-            const buttonEl = document.getElementById('programmaticallyCall');
-            buttonEl.addEventListener('click', async () => {
-                const { kbs } = window;
-
-                const data = {
-                    foo: 'bar'
-                };
-                const response = await kbs.trackEvent('custom', data);
-                console.log('Programmatically Call', response);
-            });
-        });
-    </script>
+    <script src="index.js"></script>
 </head>
 <body>
 <header>

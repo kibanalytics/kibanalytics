@@ -3,17 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Page 1</title>
-    <script src="dist/tracker.js"
+    <script src="dist/tracker.min.js"
             data-tracker-id="N7TXY7"
             data-server-url="https://kibanalytics.virail.app">
     </script>
-    <script>
-        kbs.serverSideData = { foo: 'bar' };
-        kbs.callback = (response) => {
-            console.log('callback', response);
-        }
-        console.log('serverSideData', kbs.serverSideData);
-    </script>
+    <script src="page-1.js"></script>
 </head>
 <body>
 <header>

@@ -39,7 +39,6 @@ const errorHandler = require('./src/error-handler');
         app.use(Sentry.Handlers.tracingHandler());
     }
 
-    app.disable('x-powered-by');
     app.use(helmet());
     app.use(bodyParser.json());
     app.use(session);
