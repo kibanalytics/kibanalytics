@@ -66,6 +66,10 @@ const init = async () => {
 
     if (process.env.NODE_ENV == 'development') {
         app.use(express.static('public'));
+    } else {
+        app.get('/', (req, res) => {
+            res.redirect('https://kibanalytics.io')
+        })
     }
 
     app.use(bodyParser.json());
