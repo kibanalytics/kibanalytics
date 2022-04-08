@@ -16,7 +16,7 @@ const dev = {
 const prod = {
     mode: 'production',
     devtool: false,
-    watch: true,
+    watch: false,
     entry: {
         'tracker.min': path.resolve(__dirname, 'src/client/tracker.client.js')
     },

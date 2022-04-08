@@ -57,7 +57,9 @@ const init = async () => {
         /*
             For use on servers without reverse-proxy
          */
-        app.use(helmet());
+        app.use(helmet({
+            referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+        }));
     }
 
     app.use(session);

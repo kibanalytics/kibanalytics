@@ -212,9 +212,7 @@ __webpack_require__.r(__webpack_exports__);
 
     const attr = script.getAttribute.bind(script);
     const tracker_id = attr('data-tracker-id');
-    const serverUrl = attr('data-server-url');
-
-    if (!serverUrl) throw new Error('data-server-url not found');
+    const serverUrl = attr('data-server-url') || location.origin;
 
     const eventClass = /^kbs-([a-z]+)-([\w]+[\w-]*)$/;
     const eventSelector = '[class*=\'kbs-\']';
