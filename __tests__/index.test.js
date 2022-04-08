@@ -5,7 +5,6 @@ const { writeFile } = require('fs/promises');
 const path = require('path');
 const puppeteer = require('puppeteer');
 const fetch = require('node-fetch');
-const { Client } = require('@elastic/elasticsearch')
 
 const OUTPUT_DIR_PATH = path.join(process.cwd(), '__tests__', 'output');
 const BROWSER_HEADLESS = true;
@@ -19,61 +18,21 @@ if (!existsSync(OUTPUT_DIR_PATH)) {
     console.log(`Output folder created at path ${OUTPUT_DIR_PATH}`);
 }
 
-/*
-
-const serverApiRequest = async (server, endpoint, headers, params, outputFileName) => {
-    const url = new URL(`${server}${endpoint}`);
-    url.search = new URLSearchParams(params).toString();
-
-    const response = await fetch(url, {
-        method: 'GET',
-        headers
-    });
-
-    if (!response.ok) {
-        throw {
-            status: response.status,
-            statusText: response.statusText
-        }
-    }
-
-    const data = await response.json();
-    expect(data.status).toEqual('success');
-
-    const outputFilePath = path.join(OUTPUT_DIR_PATH, `${outputFileName}.test.json`);
-    await writeFile(outputFilePath, JSON.stringify(data, null, 2), 'utf8');
-    console.log(`Response saved at path ${outputFilePath}`);
-}
-
- */
-
 describe('Collect Controller', () => {
     const server = `http://localhost:${process.env.EXPRESS_PORT}`;
     const endpoint = '/collect'
     const headers = {
         'content-type': 'application/json'
     };
-    const customSchemaBody = { type: 'custom', payload: { foo: 'bar' } };
+    const customSchemaBody = {
+        tracker_id: 'N7TXY7',
+        url: { href: 'http://localhost:3000/index.html', 'referrer': '' },
+        event: { type: 'custom', payload: { foo: 'bar' } },
+        device: { platform: 'MacIntel', screen: { width: 1680, height: 1050 } },
+        browser: { language: 'en-US', adBlock: false, cookies: true },
+        serverSide: {}
+    };
     const allowedOrigins = process.env.EXPRESS_ALLOWED_ORIGINS.split(',');
-
-    test('Test', async () => {
-        const client = new Client({ node: 'http://localhost:9200' });
-
-        const document = await client.search({
-            index: 'tracker-*',
-            body: {
-                query: {
-                    bool: {
-                        must: {
-                            term: {
-                                'event._id.keyword': '8a8a0324-9dac-4bac-8f7a-81bf2f7f9a67'
-                            }
-                        }
-                    }
-                }
-            }
-        }).then(response => response?.hits?.hits[0]);
-    });
 
     test(`Allowed Origin (${CORS_ALLOWED_ORIGIN})`, async () => {
         if (!process.env.EXPRESS_CORS || process.env.EXPRESS_CORS.toLowerCase() === 'false') {
@@ -94,6 +53,7 @@ describe('Collect Controller', () => {
 
         const data = await page.evaluate(async (server, endpoint, headers, body) => {
             const url = new URL(`${server}${endpoint}`);
+            body.url.href = location.href;
 
             try {
                 const response = await fetch(url, {
@@ -136,6 +96,7 @@ describe('Collect Controller', () => {
 
         const data = await page.evaluate(async (server, endpoint, headers, body) => {
             const url = new URL(`${server}${endpoint}`);
+            body.url.href = location.href;
 
             try {
                 const response = await fetch(url, {
@@ -178,6 +139,7 @@ describe('Collect Controller', () => {
 
         const data = await page.evaluate(async (server, endpoint, headers, body) => {
             const url = new URL(`${server}${endpoint}`);
+            body.url.href = location.href;
 
             try {
                 const response = await fetch(url, {
@@ -200,29 +162,4 @@ describe('Collect Controller', () => {
         await writeFile(outputFilePath, JSON.stringify(data, null, 2), 'utf8');
         console.log(`Response saved at path ${outputFilePath}`);
     }, 30000);
-
-    test('Custom Event', async () => {
-        const url = new URL(`${server}${endpoint}`);
-
-        const response = await fetch(url, {
-            method: 'post',
-            headers,
-            body: JSON.stringify(customSchemaBody)
-        });
-
-        if (!response.ok) {
-            throw {
-                status: response.status,
-                statusText: response.statusText
-            }
-        }
-
-        const data = await response.json();
-        expect(data.status).toEqual('success');
-
-        const outputFileName = 'custom-event';
-        const outputFilePath = path.join(OUTPUT_DIR_PATH, `${outputFileName}.test.json`);
-        await writeFile(outputFilePath, JSON.stringify(data, null, 2), 'utf8');
-        console.log(`Response saved at path ${outputFilePath}`);
-    });
 });
