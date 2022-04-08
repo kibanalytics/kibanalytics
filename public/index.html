@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <title>Home</title>
     <script src="dist/tracker.min.js"
-            data-tracker-id="N7TXY7"
-            data-server-url="https://kibanalytics.virail.app">
+            data-tracker-id="N7TXY7">
     </script>
     <script src="index.js"></script>
 </head>
@@ -23,18 +22,18 @@
 <main>
     <h1>Home</h1>
     <div>
-        <button class="kbs-click-button01"
-                onclick="console.log('Click Event')">
+        <button id="button01"
+                class="kbs-click-button01">
             Click Event
         </button>
-        <button class="kbs-click-button02"
-                data-kbs-foo="bar"
-                onclick="console.log('Click Event (Custom Data)')">
+        <button id="button02"
+                class="kbs-click-button02"
+                data-kbs-foo="bar">
             Click Event (Custom Data)
         </button>
     </div>
     <div style="margin-top: 24px">
-        <button id="programmaticallyCall">
+        <button id="button03">
             Programmatically Call
         </button>
     </div>
