@@ -42,7 +42,7 @@ const errorHandler = require('./src/error-handler');
 
     if (!!+process.env.EXPRESS_GZIP) {
         /*
-            For use on servers without reverse-proxy, for example
+            For use on servers without reverse-proxy
          */
         app.use(compression());
     }
@@ -51,7 +51,13 @@ const errorHandler = require('./src/error-handler');
         app.use(cors(corsOptions));
     }
 
-    app.use(helmet());
+    if (!!+process.env.EXPRESS_HELMET) {
+        /*
+            For use on servers without reverse-proxy
+         */
+        app.use(helmet());
+    }
+
     app.use(session);
     app.use(express.static('public'));
     app.use(bodyParser.json());
