@@ -3,6 +3,7 @@ require('dotenv').config();
 const logger = require('./src/logger');
 const redisClient = require('./src/redis-client');
 const express = require('express');
+const compression = require('compression');
 const bodyParser = require('body-parser');
 const expressWinston = require('express-winston');
 const Sentry = require('@sentry/node');
@@ -39,14 +40,21 @@ const errorHandler = require('./src/error-handler');
         app.use(Sentry.Handlers.tracingHandler());
     }
 
-    app.use(helmet());
-    app.use(bodyParser.json());
-    app.use(session);
-    app.use(express.static('public'));
+    if (!!+process.env.EXPRESS_GZIP) {
+        /*
+            For use on servers without reverse-proxy, for example
+         */
+        app.use(compression());
+    }
 
     if (!!+process.env.EXPRESS_CORS) {
         app.use(cors(corsOptions));
     }
+
+    app.use(helmet());
+    app.use(session);
+    app.use(express.static('public'));
+    app.use(bodyParser.json());
 
     app.post('/collect', controller.collect);
 
