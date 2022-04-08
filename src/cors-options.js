@@ -20,5 +20,5 @@ module.exports = {
     origin: allowedOrigins,
     credentials: true, // Enable HTTP cookies over CORS
     optionsSuccessStatus: 200,
-    methods: ['POST']
+    methods: ['POST', 'OPTION']
 };
