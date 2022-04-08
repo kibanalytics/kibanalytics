@@ -16,10 +16,9 @@ const allowedOrigins = process.env.EXPRESS_ALLOWED_ORIGINS
         return v;
     });
 
-// @TODO Needs testing
-
 module.exports = {
     origin: allowedOrigins,
+    credentials: true, // Enable HTTP cookies over CORS
     optionsSuccessStatus: 200,
-    credentials: true // Enable HTTP cookies over CORS
+    methods: ['POST']
 };

@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const expressWinston = require('express-winston');
 const Sentry = require('@sentry/node');
 const Tracing = require('@sentry/tracing');
+const helmet = require('helmet');
 const cors = require('cors');
 const corsOptions = require('./src/cors-options');
 const session = require('./src/session');
@@ -38,13 +39,14 @@ const errorHandler = require('./src/error-handler');
         app.use(Sentry.Handlers.tracingHandler());
     }
 
+    app.disable('x-powered-by');
+    app.use(helmet());
     app.use(bodyParser.json());
     app.use(session);
     app.use(express.static('public'));
 
     if (!!+process.env.EXPRESS_CORS) {
         app.use(cors(corsOptions));
-        app.options('*', cors());
     }
 
     app.post('/collect', controller.collect);
