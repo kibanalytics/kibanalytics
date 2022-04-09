@@ -6,6 +6,10 @@ const metrics = require('./metrics');
 const validateCollectEndpoint = validator.getSchema('collectEndpoint');
 
 module.exports.collect = async (req, res, next) => {
+
+    // @TODO - testing
+    res.append('Access-Control-Allow-Origin', ['*']);
+
     try {
         if (!validateCollectEndpoint(req.body)) {
             res.status(422).json({
