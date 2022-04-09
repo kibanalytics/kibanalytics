@@ -77,9 +77,6 @@ module.exports.collect = async (req, res, next) => {
 
         await redisClient.rPush(process.env.TRACKING_KEY, JSON.stringify(data));
 
-        // @TODO - testing
-        res.append('Access-Control-Allow-Origin', ['*']);
-
         res.json({ status: 'success', event_id: data.event._id });
     } catch (err) {
         next(err);
