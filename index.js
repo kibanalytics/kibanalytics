@@ -21,6 +21,8 @@ const init = async () => {
     await redisClient.connect();
     const app = express();
 
+    app.use(bodyParser.json());
+
     app.use(expressWinston.logger({
         winstonInstance: logger,
         meta: false,
@@ -59,17 +61,24 @@ const init = async () => {
          */
         app.use(helmet({
             referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-            crossOriginEmbedderPolicy: false,
-            crossOriginOpenerPolicy: false,
-            crossOriginResourcePolicy: false
+            crossOriginResourcePolicy: { policy: "cross-origin" }
         }));
     }
 
-    app.use(bodyParser.json());
-    app.use(express.static('public'));
-    app.use(session);
+    if (process.env.NODE_ENV === 'development') {
+        app.use(express.static('public'));
+    } else {
+        app.get('/', (req, res) => {
+            res.redirect('https://kibanalytics.io');
+        });
+    }
 
-    app.post('/collect', controller.collect);
+    app.get(`/${process.env.TRACKER_FILE_ALIAS ?? 'kbs.js'}`, (req, res) => {
+        res.sendFile('dist/tracker.min.js', { root: './public' });
+    });
+
+    app.use(session);
+    app.post(`/${process.env.COLLECT_ENDPOINT ?? 'collect'}`, controller.collect);
 
     app.use(Sentry.Handlers.errorHandler());
     app.use(errorHandler);
