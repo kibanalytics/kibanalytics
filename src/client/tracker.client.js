@@ -17,7 +17,7 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
 
     const attr = script.getAttribute.bind(script);
     const tracker_id = attr('data-tracker-id');
-    const serverUrl = attr('data-server-url') || location.origin;
+    const serverUrl = attr('data-server-url') || `${location.origin}/collect`;
 
     const eventClass = /^kbs-([a-z]+)-([\w]+[\w-]*)$/;
     const eventSelector = '[class*=\'kbs-\']';
@@ -32,7 +32,7 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
     const collect = async (type, payload, sendBeacon = false) => {
         if (doNotTrack()) return;
 
-        const url = `${serverUrl}/collect`;
+        const url = `${serverUrl}`;
         const body = {
             tracker_id,
             url: {
