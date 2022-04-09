@@ -20,8 +20,7 @@ if (allowedOrigins.find(origin => origin === '*'))
     throw new Error(`Invalid origin '*'. Credentials not supported if the CORS header 'Access-Control-Allow-Origin' is '*'.`);
 
 module.exports = {
-    // origin: allowedOrigins,
-    origin: "*", // @TODO - testing
+    origin: allowedOrigins,
     credentials: true, // Enable HTTP cookies over CORS
     optionsSuccessStatus: 200,
     methods: ['POST', 'OPTION']
