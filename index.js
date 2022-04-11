@@ -78,6 +78,7 @@ const init = async () => {
     });
 
     app.use(session);
+    app.post('/', controller.collect);
     app.post(`/${process.env.COLLECT_ENDPOINT ?? 'collect'}`, controller.collect);
 
     app.use(Sentry.Handlers.errorHandler());
