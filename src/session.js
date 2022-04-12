@@ -16,7 +16,6 @@ module.exports = session({
         sameSite: (process.env.NODE_ENV === 'production') ? 'none' : false,
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        proxy: process.env.NODE_ENV === 'production',
         maxAge: 6.307e+11 // 20 years
     }
 });
