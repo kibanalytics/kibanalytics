@@ -9,8 +9,9 @@ module.exports = session({
     saveUninitialized: true,
     resave: false,
     cookie: {
-        sameSite: 'lax',
+        sameSite: (process.env.NODE_ENV === 'development') ? false : 'none',
         httpOnly: true,
-        maxAge: process.env.COOKIE_TTL || 7776000 // defaulted to 90d
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 6.307e+11 // 20 years
     }
 });
