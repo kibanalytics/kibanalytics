@@ -5,6 +5,8 @@ const uaParser = require('ua-parser-js');
 const metrics = require('./metrics');
 const validateCollectEndpoint = validator.getSchema('collectEndpoint');
 
+const VISIT_DURATION = 30 * 60000; // 30 minutes
+
 module.exports.collect = async (req, res, next) => {
     try {
         const { session, body } = req;
@@ -34,12 +36,39 @@ module.exports.collect = async (req, res, next) => {
             }
         }
 
-        if (eventType === 'page-view') {
-            (session.views) ? session.views++ : session.views = 1;
+        if (session.events) {
+            session.events++;
+            session.lastEventDelta = body.event.ts.fired - session.lastEvent.ts.fired;
+        } else {
+            session.events = 1;
         }
-        (session.events) ? session.events++ : session.events = 1;
 
-        // @TODO time delta between events, last page it was
+        if (eventType === 'page-view') {
+            if (session.views) {
+                session.views++;
+            } else {
+                session.views = 1
+            }
+        }
+
+        /*
+            If visits counter exists, check the delta between the currently event ts and the last event ts.
+            If delta > VISIT_DURATION, increase visits counter and set last visit ts.
+         */
+        if (session.visits) {
+            session.lastEventVisitDelta = body.event.ts.fired - session.lastVisitTs;
+
+            if (session.lastEventDelta > VISIT_DURATION) {
+                session.lastVisitDuration = session.lastEventVisitDelta;
+                session.lastVisitTs = body.event.ts.pageStart;
+                session.visits++;
+            }
+        } else {
+            session.visits = 1;
+            session.firstVisitTs = session.lastVisitTs = body.event.ts.pageStart;
+        }
+
+        session.isNewUser = (session.visits === 1 && session.events === 1);
 
         const url = new URL(body.url.href);
         const parsedUserAgent = uaParser(req.headers['user-agent']);
@@ -55,10 +84,7 @@ module.exports.collect = async (req, res, next) => {
             },
             event: {
                 _id: uuidv4(),
-                ts: {
-                    ...body.event.ts,
-                    lastEventDelta: (session?.lastEvent?.ts?.fired) ? body.event.ts.fired - session.lastEvent.ts.fired : null
-                },
+                ts: body.event.ts,
                 type: body.event.type,
                 payload: eventType !== 'page-view' ? body.event.payload : {}
             },
@@ -76,20 +102,22 @@ module.exports.collect = async (req, res, next) => {
             userAgent: req.headers['user-agent'],
             session: {
                 _id: session.id,
-                isNewUser: session.events === 1, // @TODO revise
+                isNewUser: session.isNewUser,
+                visits: session.visits,
+                firstVisitTs: session.firstVisitTs,
+                lastVisitTs: session.lastVisitTs,
+                lastVisitDuration: session.lastVisitDuration,
                 views: session.views,
                 events: session.events,
-                lastEvent: session?.lastEvent
+                lastEvent: session.lastEvent,
+                lastEventDelta: session.lastEventDelta,
+                lastEventVisitDelta: session.lastEventVisitDelta
             },
             ip: metrics.ip(req),
             serverSide: body.serverSide
         };
 
-        session.lastEvent = {
-            _id: data.event._id,
-            ts: body.event.ts,
-            type: body.event.type
-        };
+        session.lastEvent = body.event;
 
         await redisClient.rPush(process.env.TRACKING_KEY, JSON.stringify(data));
 
