@@ -77,6 +77,10 @@ const init = async () => {
         res.sendFile('dist/tracker.min.js', { root: './public' });
     });
 
+    app.get('/robots.txt', (req, res) => {
+        res.sendFile('robots.txt', { root: './public' });
+    });
+
     app.use(session);
     /*
         If you have node.js behind a proxy and are using cookies secure: true,
