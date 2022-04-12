@@ -9,7 +9,7 @@ module.exports = session({
     saveUninitialized: true,
     resave: false,
     cookie: {
-        sameSite: 'strict',
+        sameSite: 'lax',
         httpOnly: true,
         maxAge: 6.307e+11 // 20 years
     }
