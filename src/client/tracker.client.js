@@ -4,6 +4,8 @@ import classListener from './class-listener.client';
 import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client.js';
 
 (window => {
+    const pageStartTs = (new Date()).getTime();
+
     const {
         screen,
         navigator: { language, platform },
@@ -31,6 +33,7 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
 
     const collect = async (type, payload, sendBeacon = false) => {
         if (doNotTrack()) return;
+        const eventTs = (new Date()).getTime();
 
         const url = `${serverUrl}`;
         const body = {
@@ -40,6 +43,11 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
                 referrer: currentRef
             },
             event: {
+                ts: {
+                    pageStart: pageStartTs,
+                    fired: eventTs,
+                    pageStartFiredDelta: eventTs - pageStartTs
+                },
                 type,
                 payload
             },
@@ -56,7 +64,7 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
                 cookies: cookiesEnabled
             },
             serverSide: serverSideData
-        }
+        };
 
         if (sendBeacon) {
             /*

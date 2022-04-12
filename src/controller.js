@@ -7,7 +7,9 @@ const validateCollectEndpoint = validator.getSchema('collectEndpoint');
 
 module.exports.collect = async (req, res, next) => {
     try {
-        if (!validateCollectEndpoint(req.body)) {
+        const { session, body } = req;
+
+        if (!validateCollectEndpoint(body)) {
             res.status(422).json({
                 status: 'error',
                 message: 'Schema validation error',
@@ -16,7 +18,7 @@ module.exports.collect = async (req, res, next) => {
             return;
         }
 
-        const eventType = req.body.event.type;
+        const eventType = body.event.type;
 
         if (!!+process.env.VALIDATE_JSON_SCHEMA && eventType !== 'page-view') {
             const validate = validator.getSchema(eventType);
@@ -26,53 +28,67 @@ module.exports.collect = async (req, res, next) => {
                 return;
             }
 
-            if (!validate(req.body.event?.payload)) {
+            if (!validate(body.event?.payload)) {
                 res.status(422).json({ status: 'error', message: 'Schema validation error', errors: validate.errors });
                 return;
             }
         }
 
         if (eventType === 'page-view') {
-            (req.session.views) ? req.session.views++ : req.session.views = 1;
+            (session.views) ? session.views++ : session.views = 1;
         }
+        (session.events) ? session.events++ : session.events = 1;
 
         // @TODO time delta between events, last page it was
 
-        const url = new URL(req.body.url.href);
+        const url = new URL(body.url.href);
         const parsedUserAgent = uaParser(req.headers['user-agent']);
 
         const data = {
-            tracker_id: req.body.tracker_id,
+            tracker_id: body.tracker_id,
             url: {
                 hostname: url.hostname,
                 pathname: url.pathname,
                 search: url.search,
                 hash: url.hash,
-                ...req.body.url
+                ...body.url
             },
             event: {
                 _id: uuidv4(),
-                type: req.body.event.type,
-                payload: eventType !== 'page-view' ? req.body.event.payload : {}
+                ts: {
+                    ...body.event.ts,
+                    lastEventDelta: (session?.lastEvent?.ts?.fired) ? body.event.ts.fired - session.lastEvent.ts.fired : null
+                },
+                type: body.event.type,
+                payload: eventType !== 'page-view' ? body.event.payload : {}
             },
             device: {
                 os: parsedUserAgent.os,
                 cpu: parsedUserAgent.cpu,
                 ...parsedUserAgent.device,
-                ...req.body.device
+                ...body.device
             },
             browser: {
                 engine: parsedUserAgent.engine,
                 ...parsedUserAgent.browser,
-                ...req.body.browser
+                ...body.browser
             },
             userAgent: req.headers['user-agent'],
             session: {
-                _id: req.session.id,
-                views: req.session.views
+                _id: session.id,
+                isNewUser: session.events === 1, // @TODO revise
+                views: session.views,
+                events: session.events,
+                lastEvent: session?.lastEvent
             },
             ip: metrics.ip(req),
-            serverSide: req.body.serverSide
+            serverSide: body.serverSide
+        };
+
+        session.lastEvent = {
+            _id: data.event._id,
+            ts: body.event.ts,
+            type: body.event.type
         };
 
         await redisClient.rPush(process.env.TRACKING_KEY, JSON.stringify(data));

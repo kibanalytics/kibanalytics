@@ -199,6 +199,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 (window => {
+    const pageStartTs = (new Date()).getTime();
+
     const {
         screen,
         navigator: { language, platform },
@@ -212,7 +214,7 @@ __webpack_require__.r(__webpack_exports__);
 
     const attr = script.getAttribute.bind(script);
     const tracker_id = attr('data-tracker-id');
-    const serverUrl = attr('data-server-url') || location.origin;
+    const serverUrl = attr('data-server-url') || `${location.origin}/collect`;
 
     const eventClass = /^kbs-([a-z]+)-([\w]+[\w-]*)$/;
     const eventSelector = '[class*=\'kbs-\']';
@@ -226,8 +228,9 @@ __webpack_require__.r(__webpack_exports__);
 
     const collect = async (type, payload, sendBeacon = false) => {
         if ((0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.doNotTrack)()) return;
+        const eventTs = (new Date()).getTime();
 
-        const url = `${serverUrl}/collect`;
+        const url = `${serverUrl}`;
         const body = {
             tracker_id,
             url: {
@@ -235,6 +238,11 @@ __webpack_require__.r(__webpack_exports__);
                 referrer: currentRef
             },
             event: {
+                ts: {
+                    pageStart: pageStartTs,
+                    fired: eventTs,
+                    pageStartFiredDelta: eventTs - pageStartTs
+                },
                 type,
                 payload
             },
@@ -251,7 +259,7 @@ __webpack_require__.r(__webpack_exports__);
                 cookies: _utils_client_js__WEBPACK_IMPORTED_MODULE_1__.cookiesEnabled
             },
             serverSide: serverSideData
-        }
+        };
 
         if (sendBeacon) {
             /*

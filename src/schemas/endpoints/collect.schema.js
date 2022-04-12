@@ -14,6 +14,19 @@ module.exports = {
         event: {
             type: 'object',
             properties: {
+                ts: {
+                    type: 'object',
+                    properties: {
+                        pageStart: { type: 'number' },
+                        fired: { type: 'number' },
+                        pageStartFiredDelta: { type: 'number' }
+                    },
+                    required: [
+                        'pageStart',
+                        'fired',
+                        'pageStartFiredDelta'
+                    ]
+                },
                 type: { type: 'string' },
                 payload: { typeof: 'object' }
             },

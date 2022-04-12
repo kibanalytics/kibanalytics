@@ -56,7 +56,7 @@ describe('CORS', () => {
     };
     const allowedOrigins = process.env.EXPRESS_ALLOWED_ORIGINS.split(',');
 
-    /*
+    // Draft
     test('Test', async () => {
         const responsePromise = new Promise(async (resolve, reject) => {
             tunnel(tunnelConfig, (error, server) => {
@@ -70,7 +70,7 @@ describe('CORS', () => {
                             bool: {
                                 must: {
                                     term: {
-                                        'event._id.keyword': '655d24bc-6785-4bd9-a0f4-f2956742bfa7'
+                                        'event._id.keyword': '681161f9-7415-4bcf-bf85-476b388ad57a'
                                     }
                                 }
                             }
@@ -87,7 +87,6 @@ describe('CORS', () => {
         const response = await responsePromise;
         console.log();
     });
-     */
 
     test(`Allowed Origin (${CORS_ALLOWED_ORIGIN})`, async () => {
         if (!process.env.EXPRESS_CORS || process.env.EXPRESS_CORS.toLowerCase() === 'false') {
