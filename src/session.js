@@ -9,6 +9,7 @@ module.exports = session({
     saveUninitialized: true,
     resave: false,
     cookie: {
+        sameSite: 'strict',
         httpOnly: true,
         maxAge: process.env.COOKIE_TTL || 7776000 // defaulted to 90d
     }
