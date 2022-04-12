@@ -10,6 +10,6 @@ module.exports = session({
     resave: false,
     cookie: {
         httpOnly: true,
-        maxAge: 6.307e+11 // 20 years
+        maxAge: process.env.COOKIE_TTL || 7776000 // defaulted to 90d
     }
 });
