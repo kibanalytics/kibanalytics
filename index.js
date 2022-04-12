@@ -61,7 +61,7 @@ const init = async () => {
          */
         app.use(helmet({
             referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-            crossOriginResourcePolicy: { policy: "cross-origin" }
+            crossOriginResourcePolicy: { policy: 'cross-origin' }
         }));
     }
 
@@ -78,6 +78,12 @@ const init = async () => {
     });
 
     app.use(session);
+    /*
+        If you have node.js behind a proxy and are using cookies secure: true,
+        you need to set "trust proxy" in express.
+     */
+    if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1);
+
     app.post('/', controller.collect);
     app.post(`/${process.env.COLLECT_ENDPOINT ?? 'collect'}`, controller.collect);
 

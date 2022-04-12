@@ -1,14 +1,25 @@
 require('dotenv').config();
 
-const { existsSync, mkdirSync } = require('fs');
+const { readFileSync, existsSync, mkdirSync } = require('fs');
 const { writeFile } = require('fs/promises');
 const path = require('path');
+const tunnel = require('tunnel-ssh');
 const puppeteer = require('puppeteer');
 const fetch = require('node-fetch');
+
+/*
+    Elasticsearch clients are forward compatible; meaning that clients support communicating with greater
+    or equal minor versions of Elasticsearch. Elasticsearch language clients are only backwards compatible with
+    default distributions and without guarantees made.
+ */
+const { Client } = require('@elastic/elasticsearch');
+
+const SERVER_URL = `http://localhost:${process.env.EXPRESS_PORT}`;
 
 const OUTPUT_DIR_PATH = path.join(process.cwd(), '__tests__', 'output');
 const BROWSER_HEADLESS = true;
 const BROWSER_DEVTOOLS = false;
+
 const CORS_ALLOWED_ORIGIN = 'https://www.virail.it';
 const CORS_NOT_ALLOWED_ORIGIN = 'https://www.virail.com.br';
 const CORS_ALLOWED_SUBDOMAINS = '*.meilisearch.com';
@@ -18,8 +29,19 @@ if (!existsSync(OUTPUT_DIR_PATH)) {
     console.log(`Output folder created at path ${OUTPUT_DIR_PATH}`);
 }
 
-describe('Collect Controller', () => {
-    const server = `http://localhost:${process.env.EXPRESS_PORT}`;
+describe('CORS', () => {
+    const tunnelConfig = {
+        agent: process.env.SSH_AUTH_SOCK,
+        host: process.env.SSH_HOST,
+        port: process.env.SSH_PORT,
+        username: process.env.SSH_USER,
+        privateKey: readFileSync('/Users/ibrahimnetto/.ssh/id_rsa'),
+        dstHost: '10.0.1.2',
+        dstPort: 9200,
+        localHost: '127.0.0.1',
+        localPort: 9200
+    };
+
     const endpoint = '/collect'
     const headers = {
         'content-type': 'application/json'
@@ -33,6 +55,38 @@ describe('Collect Controller', () => {
         serverSide: {}
     };
     const allowedOrigins = process.env.EXPRESS_ALLOWED_ORIGINS.split(',');
+
+    // Draft
+    test('Test', async () => {
+        const responsePromise = new Promise(async (resolve, reject) => {
+            tunnel(tunnelConfig, (error, server) => {
+                if (error) reject(error);
+                const client = new Client({ node: 'http://127.0.0.1:9200' });
+
+                client.search({
+                    index: 'kibanalytics-*', // @TODO use env variable for index
+                    body: {
+                        query: {
+                            bool: {
+                                must: {
+                                    term: {
+                                        'event._id.keyword': '681161f9-7415-4bcf-bf85-476b388ad57a'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                })
+                    .then(response => resolve(response))
+                    .catch(err => reject(err))
+                    // .finally(server.close());
+
+            });
+        });
+
+        const response = await responsePromise;
+        console.log();
+    });
 
     test(`Allowed Origin (${CORS_ALLOWED_ORIGIN})`, async () => {
         if (!process.env.EXPRESS_CORS || process.env.EXPRESS_CORS.toLowerCase() === 'false') {
@@ -51,8 +105,8 @@ describe('Collect Controller', () => {
         const page = await browser.newPage();
         await page.goto(CORS_ALLOWED_ORIGIN);
 
-        const data = await page.evaluate(async (server, endpoint, headers, body) => {
-            const url = new URL(`${server}${endpoint}`);
+        const data = await page.evaluate(async (SERVER_URL, endpoint, headers, body) => {
+            const url = new URL(`${SERVER_URL}${endpoint}`);
             body.url.href = location.href;
 
             try {
@@ -66,7 +120,7 @@ describe('Collect Controller', () => {
             } catch (err) {
                 return err.toString();
             }
-        }, server, endpoint, headers, customSchemaBody);
+        }, SERVER_URL, endpoint, headers, customSchemaBody);
 
         await browser.close();
         expect(data.status).toEqual('success');
@@ -77,7 +131,7 @@ describe('Collect Controller', () => {
         console.log(`Response saved at path ${outputFilePath}`);
     }, 30000);
 
-    test(`CORS Error (${CORS_NOT_ALLOWED_ORIGIN})`, async () => {
+    test(`Not Allowed Origin (${CORS_NOT_ALLOWED_ORIGIN})`, async () => {
         if (!process.env.EXPRESS_CORS || process.env.EXPRESS_CORS.toLowerCase() === 'false') {
             throw new Error('EXPRESS_CORS not set | disabled');
         }
@@ -94,8 +148,8 @@ describe('Collect Controller', () => {
         const page = await browser.newPage();
         await page.goto(CORS_NOT_ALLOWED_ORIGIN);
 
-        const data = await page.evaluate(async (server, endpoint, headers, body) => {
-            const url = new URL(`${server}${endpoint}`);
+        const data = await page.evaluate(async (SERVER_URL, endpoint, headers, body) => {
+            const url = new URL(`${SERVER_URL}${endpoint}`);
             body.url.href = location.href;
 
             try {
@@ -109,7 +163,7 @@ describe('Collect Controller', () => {
             } catch (err) {
                 return err.toString();
             }
-        }, server, endpoint, headers, customSchemaBody);
+        }, SERVER_URL, endpoint, headers, customSchemaBody);
 
         await browser.close();
         expect(data).toEqual('TypeError: Failed to fetch');
@@ -120,7 +174,7 @@ describe('Collect Controller', () => {
         console.log(`Response saved at path ${outputFilePath}`);
     }, 30000);
 
-    test(`Allowed Subdomains (${CORS_ALLOWED_SUBDOMAINS})`, async () => {
+    test(`Allowed Subdomain (${CORS_ALLOWED_SUBDOMAINS})`, async () => {
         if (!process.env.EXPRESS_CORS || process.env.EXPRESS_CORS.toLowerCase() === 'false') {
             throw new Error('EXPRESS_CORS not set | disabled');
         }
@@ -137,8 +191,8 @@ describe('Collect Controller', () => {
         const page = await browser.newPage();
         await page.goto(CORS_ALLOWED_SUBDOMAINS.replace('*', 'https://www'));
 
-        const data = await page.evaluate(async (server, endpoint, headers, body) => {
-            const url = new URL(`${server}${endpoint}`);
+        const data = await page.evaluate(async (SERVER_URL, endpoint, headers, body) => {
+            const url = new URL(`${SERVER_URL}${endpoint}`);
             body.url.href = location.href;
 
             try {
@@ -152,7 +206,7 @@ describe('Collect Controller', () => {
             } catch (err) {
                 return err.toString();
             }
-        }, server, endpoint, headers, customSchemaBody);
+        }, SERVER_URL, endpoint, headers, customSchemaBody);
 
         await browser.close();
         expect(data.status).toEqual('success');
