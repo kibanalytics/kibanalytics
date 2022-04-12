@@ -61,7 +61,7 @@ const init = async () => {
          */
         app.use(helmet({
             referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-            crossOriginResourcePolicy: { policy: "cross-origin" }
+            crossOriginResourcePolicy: { policy: 'cross-origin' }
         }));
     }
 
