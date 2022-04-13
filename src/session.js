@@ -1,3 +1,4 @@
+const { v4: uuidv4 } = require('uuid');
 const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
 const redisClient = require('./redis-client');
@@ -8,6 +9,7 @@ module.exports = session({
     store: new RedisStore({ client: redisClient }),
     saveUninitialized: true,
     resave: false,
+    genid: () => uuidv4(),
     cookie: {
         /*
             Cookies will be sent in all contexts, i.e. in responses to both first-party and cross-origin requests.

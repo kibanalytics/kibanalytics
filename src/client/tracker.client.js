@@ -4,7 +4,7 @@ import classListener from './class-listener.client';
 import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client.js';
 
 (window => {
-    const pageStartTs = (new Date()).getTime();
+    const kbsStartedTs = (new Date()).getTime();
 
     const {
         screen,
@@ -17,6 +17,9 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
     const script = document.querySelector('script[data-tracker-id]');
     if (!script) throw new Error('data-tracker-id not found');
 
+    /*
+        @TODO prefix html attributes with kbs. For example, data-kbs-*. This is a breaking change.
+     */
     const attr = script.getAttribute.bind(script);
     const tracker_id = attr('data-tracker-id');
     const serverUrl = attr('data-server-url') || `${location.origin}/collect`;
@@ -44,9 +47,9 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
             },
             event: {
                 ts: {
-                    pageStart: pageStartTs,
-                    fired: eventTs,
-                    pageStartFiredDelta: eventTs - pageStartTs
+                    kbsStarted: kbsStartedTs,
+                    started: eventTs,
+                    kbsStartedDelta: eventTs - kbsStartedTs
                 },
                 type,
                 payload
@@ -134,7 +137,7 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
         currentUrl = location.href;
 
         if (currentUrl !== currentRef) {
-            trackEvent('page-view');
+            trackEvent('pageview');
         }
     };
 
@@ -152,7 +155,6 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
     };
 
     // @TODO Referal Host
-    // @TODO new user or not
 
     /* Global */
 
@@ -186,7 +188,7 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
 
         const update = () => {
             if (document.readyState === 'complete') {
-                trackEvent('page-view');
+                trackEvent('pageview');
                 addEvents(document);
                 observeDocument();
             }
