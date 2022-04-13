@@ -117,7 +117,7 @@ module.exports.collect = async (req, res, next) => {
             serverSide: body.serverSide
         };
 
-        session.lastEvent = body.event;
+        session.lastEvent = data.event;
 
         await redisClient.rPush(process.env.TRACKING_KEY, JSON.stringify(data));
 
