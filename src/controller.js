@@ -5,11 +5,12 @@ const uaParser = require('ua-parser-js');
 const metrics = require('./metrics');
 const validateCollectEndpoint = validator.getSchema('collectEndpoint');
 
-const VISIT_DURATION = 30 * 60000; // 30 minutes
+const EVENT_FLOW_WITH_PAYLOAD = true; // @TODO make this configurable
+const SESSION_DURATION = 30 * 60000; // 30 minutes @TODO make this configurable
 
 module.exports.collect = async (req, res, next) => {
     try {
-        const { session, body } = req;
+        const { body } = req;
 
         if (!validateCollectEndpoint(body)) {
             res.status(422).json({
@@ -22,7 +23,7 @@ module.exports.collect = async (req, res, next) => {
 
         const eventType = body.event.type;
 
-        if (!!+process.env.VALIDATE_JSON_SCHEMA && eventType !== 'page-view') {
+        if (!!+process.env.VALIDATE_JSON_SCHEMA && eventType !== 'pageview') {
             const validate = validator.getSchema(eventType);
 
             if (validate === undefined) {
@@ -36,39 +37,87 @@ module.exports.collect = async (req, res, next) => {
             }
         }
 
-        if (session.events) {
-            session.events++;
-            session.lastEventDelta = body.event.ts.fired - session.lastEvent.ts.fired;
-        } else {
-            session.events = 1;
-        }
+        if (req.session.user) {
+            /*
+                If user exists, we have a last event, then check the delta between the current event ts
+                and the last event ts. If delta > SESSION_DURATION, generate a new session.
+            */
+            req.session.user.new = false;
+            req.session.ts.currentLastEventStartedDelta = (req.session.lastEvent) ?
+                body.event.ts.started - req.session.lastEvent.ts.started
+                : null;
 
-        if (eventType === 'page-view') {
-            if (session.views) {
-                session.views++;
+            if (req.session.ts.currentLastEventStartedDelta > SESSION_DURATION) {
+                // Store user pointer to apply to regenerated session
+                const user = req.session.user;
+
+                // Promise version of session.regenerate fn
+                const regenerate = () => new Promise((resolve, reject) => {
+                    req.session.regenerate((err) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+                        // req.session properties cleared and new session.id created
+                        resolve();
+                    })
+                });
+                await regenerate();
+
+                // Session regenerated keeping previous user information
+                req.session.new = true;
+                req.session.user = user;
+                req.session.user.sessions++;
             } else {
-                session.views = 1
-            }
-        }
-
-        /*
-            If visits counter exists, check the delta between the currently event ts and the last event ts.
-            If delta > VISIT_DURATION, increase visits counter and set last visit ts.
-         */
-        if (session.visits) {
-            session.lastEventVisitDelta = body.event.ts.fired - session.lastVisitTs;
-
-            if (session.lastEventDelta > VISIT_DURATION) {
-                session.lastVisitDuration = session.lastEventVisitDelta;
-                session.lastVisitTs = body.event.ts.pageStart;
-                session.visits++;
+                // Current session still valid
+                req.session.new = false;
             }
         } else {
-            session.visits = 1;
-            session.firstVisitTs = session.lastVisitTs = body.event.ts.pageStart;
+            // New user & session
+            req.session.new = true;
+            req.session.user = {
+                _id: uuidv4(),
+                new: true,
+                sessions: 1,
+                events: 0,
+                views: 0
+            };
         }
 
-        session.isNewUser = (session.visits === 1 && session.events === 1);
+        if (req.session.new) {
+            req.session.events = 0;
+            req.session.eventsFlow = [];
+            req.session.views = 0;
+            req.session.viewsFlow = [];
+            req.session.ts = {
+                started: body.event.ts.kbsStarted
+            };
+        }
+
+        // req.session pointer will not change anymore
+        const { session } = req;
+
+        const event = {
+            _id: uuidv4(),
+            type: body.event.type,
+            ts: body.event.ts,
+            payload: eventType !== 'pageview' ? body.event.payload : {}
+        };
+        session.user.events++;
+        session.events++;
+        session.eventsFlow.push({
+            _id: event._id,
+            href: body.url.href,
+            type: event.type,
+            ts: event.ts,
+            payload: EVENT_FLOW_WITH_PAYLOAD ? event.payload : null
+        });
+
+        if (eventType === 'pageview') {
+            session.user.views++;
+            session.views++;
+            session.viewsFlow.push(body.url.href);
+        }
 
         const url = new URL(body.url.href);
         const parsedUserAgent = uaParser(req.headers['user-agent']);
@@ -82,12 +131,7 @@ module.exports.collect = async (req, res, next) => {
                 hash: url.hash,
                 ...body.url
             },
-            event: {
-                _id: uuidv4(),
-                ts: body.event.ts,
-                type: body.event.type,
-                payload: eventType !== 'page-view' ? body.event.payload : {}
-            },
+            event: event,
             device: {
                 os: parsedUserAgent.os,
                 cpu: parsedUserAgent.cpu,
@@ -100,21 +144,19 @@ module.exports.collect = async (req, res, next) => {
                 ...body.browser
             },
             userAgent: req.headers['user-agent'],
+            user: session.user,
             session: {
                 _id: session.id,
-                isNewUser: session.isNewUser,
-                visits: session.visits,
-                firstVisitTs: session.firstVisitTs,
-                lastVisitTs: session.lastVisitTs,
-                lastVisitDuration: session.lastVisitDuration,
-                views: session.views,
+                new: session.new,
                 events: session.events,
-                lastEvent: session.lastEvent,
-                lastEventDelta: session.lastEventDelta,
-                lastEventVisitDelta: session.lastEventVisitDelta
+                eventsFlow: session.eventsFlow,
+                lastEvent: session.lastEvent, // @TODO lastEvent now is redundant with eventsFlow, the last item of the array is the lastEvent
+                views: session.views,
+                viewsFlow: session.viewsFlow,
+                ts: req.session.ts
             },
             ip: metrics.ip(req),
-            serverSide: body.serverSide
+            serverSide: body.serverSide // @TODO maybe changing property name to custom ?
         };
 
         session.lastEvent = data.event;

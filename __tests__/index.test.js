@@ -70,7 +70,7 @@ describe('CORS', () => {
                             bool: {
                                 must: {
                                     term: {
-                                        'event._id.keyword': '681161f9-7415-4bcf-bf85-476b388ad57a'
+                                        'event._id.keyword': '7ad8c6df-4922-4984-9fd8-73b4a5236aa0'
                                     }
                                 }
                             }
