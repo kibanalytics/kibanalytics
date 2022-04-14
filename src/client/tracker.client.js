@@ -42,9 +42,9 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
         const body = {
             tracker_id,
             url: {
-                href: currentUrl,
-                referrer: currentRef
+                href: currentUrl
             },
+            referrer: currentRef,
             event: {
                 ts: {
                     kbsStarted: kbsStartedTs,

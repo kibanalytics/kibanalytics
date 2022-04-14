@@ -1,5 +1,5 @@
 ---
-title: Website analytics
+title: Website analytics 
 lang: en-US
 ---
 
@@ -7,9 +7,12 @@ lang: en-US
 
 [[toc]]
 
-This project aims to make use of the [ELK stack](https://www.elastic.co/what-is/elk-stack) to collect events from web pages and visualize them, offering the same kind of insights that [Google Analytics](https://analytics.google.com/analytics/web/) does.
+This project aims to make use of the [ELK stack](https://www.elastic.co/what-is/elk-stack) to collect events from web
+pages and visualize them, offering the same kind of insights
+that [Google Analytics](https://analytics.google.com/analytics/web/) does.
 
-The reason behind this project is to provide an alternative to GA, that offers data ownership, adblocker avoidance, powerful aggregations, grained filtering and big data storage.
+The reason behind this project is to provide an alternative to GA, that offers data ownership, adblocker avoidance,
+powerful aggregations, grained filtering and big data storage.
 
 ## Setup
 
@@ -17,7 +20,7 @@ The reason behind this project is to provide an alternative to GA, that offers d
 
 Kibanalytics will look for a .env file at the root of the project folder to apply settings to the server.
 
-::: tip
+::: tip 
 Use .env.example as base for your environment variables setup.
 :::
 
@@ -77,34 +80,129 @@ Use .env.example as base for your environment variables setup.
 
 ## Schema
 
+### Collected Data
+
 ```javascript
-const Schema = {
-    title: 'Schema',
-    description: `Output JSON document with all tracked data.`,
+const CollectedData = {
+    $id: '/schemas/collected-data',
+    title: 'Collected Data',
+    description: `Document with all collected data.`,
     properties: {
         tracker_id: {
             description: ``,
             type: 'string',
             example: ''
-        }
+        },
+        url: { $ref: '/schemas/url' },
+        referrer: {
+            description: `The referer contains an absolute or partial address of the page 
+                          that makes the request. The referer allows identify a page where 
+                          the user are visiting it from`,
+            type: 'string',
+            example: 'https://www.virail.com/'
+        },
+        event: { $ref: '/schemas/event' },
+        device: { $ref: '/schemas/device' },
+        browser: { $ref: '/schemas/browser' },
+        userAgent: {
+            description: `User agent is any software, acting on behalf of a user, which 
+                          "retrieves, renders and facilitates end-user interaction with Web content. 
+                          This string contanins information about the application, operating system, 
+                          vendor, and/or version of the requesting user agent".`,
+            type: 'string',
+            example: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36 OPR/85.0.4341.60'
+        },
+        session: { $ref: '/schemas/session' },
+        ip: { $ref: '/schemas/ip' },
+        serverSide: { $ref: '/schemas/server-side' },
     },
     required: [
-        'tracker_id'
+        'tracker_id',
+        'url',
+        'referrer',
+        'event',
+        'device',
+        'browser',
+        'userAgent',
+        'session',
+        'ip',
+        'serverSide'
     ]
 };
 ```
 
 ### URL
 
+URL stands for Uniform Resource Locator, colloquially termed as web address. A URL is the address of a given unique
+resource on the Web. In theory, each valid URL points to a unique resource. Such resources can be an HTML page, a CSS
+document, an image, etc.
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                              href                                              │
+├──────────┬──┬─────────────────────┬────────────────────────┬───────────────────────────┬───────┤
+│ protocol │  │        auth         │          host          │           path            │ hash  │
+│          │  │                     ├─────────────────┬──────┼──────────┬────────────────┤       │
+│          │  │                     │    hostname     │ port │ pathname │     search     │       │
+│          │  │                     │                 │      │          ├─┬──────────────┤       │
+│          │  │                     │                 │      │          │ │    query     │       │
+"  https:   //    user   :   pass   @ sub.example.com : 8080   /p/a/t/h  ?  query=string   #hash "
+│          │  │          │          │    hostname     │ port │          │                │       │
+│          │  │          │          ├─────────────────┴──────┤          │                │       │
+│ protocol │  │ username │ password │          host          │          │                │       │
+├──────────┴──┴──────────┴──────────┼────────────────────────┤          │                │       │
+│                                   │         origin         │ pathname │     search     │ hash  │
+├───────────────────────────────────┴────────────────────────┴──────────┴────────────────┴───────┤
+│                                              href                                              │
+└────────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+Source: [Node.js URL strings and URL objects](https://nodejs.org/api/url.html#url-strings-and-url-objects)
+
+A URL string contains multiple meaningful components. When parsed, a URL object is returned
+containing properties for each of these components.
+
 ```javascript
 const Url = {
+    $id: '/schemas/url',
     title: 'URL',
-    description: ``,
+    description: `Group of properties parsed from a valid URL and .`,
     properties: {
-        
+        href: {
+            description: `Hypertext reference is the whole URL.`,
+            type: 'string',
+            example: 'https://www.virail.com.ua/poezd-suchava-yassy'
+        },
+        hostname: {
+            description: `Hostname is the domain name of the URL`,
+            type: 'string',
+            example: 'www.virail.com.ua'
+        },
+        pathname: {
+            description: `Pathname is the part of the URL containing an initial '/' 
+                          followed by the path of the URL not including the query string or fragment 
+                          (or the empty string if there is no path).`,
+            type: 'string',
+            example: '/poezd-suchava-yassy'
+        },
+        search: {
+            description: `Search, also called a query string, is the part of the URL containing a '?' 
+                          followed by the parameters of the URL.`,
+            type: 'string',
+            example: '?q=Berlin'
+        },
+        hash: {
+            description: `Hash is the part of the URL containing a '#' followed by the fragment 
+                          identifier of the URL.`,
+            type: 'string',
+            example: '#event'
+        },
     },
     required: [
-        
+        'href',
+        'hostname',
+        'pathname',
+        'search',
+        'hash'
     ]
 };
 ```
@@ -113,6 +211,7 @@ const Url = {
 
 ```javascript
 const Event = {
+    $id: '/schemas/event',
     title: 'Event',
     description: ``,
     properties: {
@@ -132,31 +231,136 @@ const Event = {
 
 ### Device
 
+The device information is extracted from the user agent string using [UAParser.js](https://github.com/faisalman/ua-parser-js) library and from the browser [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
+
 ```javascript
 const Device = {
+    $id: '/schemas/device',
     title: 'Device',
-    description: ``,
+    description: `Information about the user agent device.`,
     properties: {
-        
+        type: {
+            description: `Device type based on user agent.`,
+            type: 'string',
+            enum: [
+                'desktop',
+                'mobile',
+                'tablet',
+                'console',
+                'smarttv',
+                'wearable',
+                'embedded'
+            ],
+            example: 'desktop'
+        },
+        vendor: {
+            description: `Device vendor based on user agent.`,
+            type: 'string',
+            example: 'Apple'
+        },
+        model: {
+            description: `Device model based on user agent.`,
+            type: 'string',
+            example: 'SM-A515F'
+        },
+        cpu: {
+            description: `Device CPU based on user agent.`,
+            type: 'object',
+            properties: {
+                architecture: {
+                    description: `CPU architecture.`,
+                    type: 'string',
+                    enum: [
+                        '68k',
+                        'amd64',
+                        'arm[64/hf]',
+                        'avr',
+                        'ia[32/64]',
+                        'irix[64]',
+                        'mips[64]',
+                        'pa-risc',
+                        'ppc',
+                        'sparc[64]'
+                    ],
+                    example: 'amd64'
+                }
+            },
+            required: [
+                'architecture'
+            ]
+        },
+        platform: {
+            description: `Device platform from Navigator.platform Web API. Most browsers, including 
+                          Chrome, Edge, and Firefox 63 and later, return "Win32" even if 
+                          running on a 64-bit version of Windows. Internet Explorer and versions 
+                          of Firefox prior to version 63 still report "Win64"`,
+            type: 'string',
+            example: 'Linux armv8l'
+        },
+        os: {
+            description: `Device operation system from user agent.`,
+            type: 'object',
+            properties: {
+                name: {
+                    description: `Operation system name.`,
+                    type: 'string',
+                    example: 'Windows'
+                },
+                version: {
+                    description: `Operation system version.`,
+                    type: 'string',
+                    example: '10'
+                }
+            },
+            required: [
+                'name',
+                'version'
+            ]
+        },
+        screen: {
+            description: `Device screen resolution from Screen Web API.`,
+            type: 'object',
+            properties: {
+                width: {
+                    description: `Screen width in pixels.`,
+                    type: 'number',
+                    example: 360
+                },
+                height: {
+                    description: `Screen height in pixels.`,
+                    type: 'number',
+                    example: 800
+                }
+            },
+            required: [
+                'width',
+                'height'
+            ]
+        },
     },
     required: [
-        
+        'type',
+        'vendor',
+        'model',
+        'cpu',
+        'platform',
+        'os',
+        'screen'
     ]
 };
 ```
 
 ### Browser
 
+The browser information is extracted from the user agent string using [UAParser.js](https://github.com/faisalman/ua-parser-js) library, from the browser [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API) and from tracker.js custom functions.
+
 ```javascript
 const Browser = {
+    $id: '/schemas/browser',
     title: 'Browser',
     description: ``,
-    properties: {
-        
-    },
-    required: [
-        
-    ]
+    properties: {},
+    required: []
 };
 ```
 
@@ -164,12 +368,15 @@ const Browser = {
 
 An individual who interacts with a website. Each user can visit a website several times, creating multiple sessions.
 
-By default, each unique device / web browser will be counted as a separate user, which means someone visiting your website on multiple devices / browsers will mean more than one user reported.
+By default, each unique device / web browser will be counted as a separate user, which means someone visiting your
+website on multiple devices / browsers will mean more than one user reported.
 
-User data is carried on new sessions, with exception if the previous session cookie is expired / deleted before the regeneration of a new session.
+User data is carried on new sessions, with exception if the previous session cookie is expired / deleted before the
+regeneration of a new session.
 
 ```javascript
 const User = {
+    $id: '/schemas/user',
     title: 'User',
     description: ``,
     properties: {
@@ -219,17 +426,19 @@ const User = {
 
 ### Session
 
-A web session is a series of contiguous actions by a visitor on an individual website within a given time frame. These actions are called events.
+A web session is a series of contiguous actions by a visitor on an individual website within a given time frame. These
+actions are called events.
 
 A session will expire if the maximum lifetime of the cookie ('expires' cookie attribute) is exceeded.
 
-::: tip
+::: tip 
 By default, the 'expires' cookie attribute is set to 90 days, but it can be changed on '/src/session.js'.
 :::
 
-Also, a session will expire if the current event timestamp and last event timestamp delta is greater than the SESSION_DURATION value. 
+Also, a session will expire if the current event timestamp and last event timestamp delta is greater than the
+SESSION_DURATION value.
 
-::: tip
+::: tip 
 By default, SESSION_DURATION is set to 30 minutes, but it can be changed on '/src/controller.js'.
 :::
 
@@ -237,6 +446,7 @@ On this case, the session will be regenerated with a new session _id and will pr
 
 ```javascript
 const Session = {
+    $id: '/schemas/session',
     title: 'Session',
     description: `Web session.`,
     type: 'object',
@@ -305,15 +515,109 @@ const Session = {
 
 ### IP
 
+IP addresses are the identifier that allows information to be sent between devices on a network: they contain location
+information and make devices accessible for communication.
+
+This projects uses [GeoIP-lite](https://github.com/geoip-lite/node-geoip) library to parse IP geo mapping information.
+
+GeoIP-lite includes the GeoLite database from [MaxMind](https://www.maxmind.com/). This database is not the most
+accurate database available, however it is the best available for free. You can use the commercial GeoIP database from
+MaxMind with better accuracy by buying a license from MaxMind, and then using the conversion utility to convert it to a
+format that geoip-lite understands. You will need to use the .csv files from MaxMind for conversion.
+
+::: warning
+IP geolocation is inherently imprecise. Locations are often near the center of the population. Any location provided by
+GeoIP-lite should not be used to identify a particular address or household.
+:::
+
+Both IPv4 and IPv6 addresses are supported, however for IPv6, since the free database GeoIP-lite uses does not currently contain any city
+or region information, city, region and postal code lookups are only supported for IPv4.
+
 ```javascript
 const Ip = {
+    $id: '/schemas/ip',
     title: 'IP',
-    description: ``,
+    description: `Group of properties related to a IP geo mapping information.`,
     properties: {
-
+        address: {
+            description: `Unique address (IPv4 or IPv6)that identifies a device 
+                          on the internet or a local network.`,
+            type: 'string',
+            example: '37.29.245.229'
+        },
+        range: {
+            description: `2-tutple of Low and high bound of IP block.`,
+            type: 'array',
+            items: {
+                type: 'integer'
+            },
+            minItems: 2,
+            maxItems: 2,
+            example: [622720384, 622720511]
+        },
+        country: {
+            description: `2 letter ISO-3166-1 country code.`,
+            type: 'string',
+            minLength: 2,
+            maxLength: 2,
+            example: 'ES'
+        },
+        eu: {
+            description: `Flag indicating if the country is a member state of the European Union.`,
+            type: 'boolean',
+            example: true
+        },
+        region: {
+            description: `Up to 3 alphanumeric variable length characters as ISO 3166-2 code.
+                          For US states this is the 2 letter state, for the United Kingdom this could 
+                          be ENG as a country like "England". FIPS 10-4 subcountry code.`,
+            type: 'string',
+            minLength: 2,
+            maxLength: 3,
+            example: 'ENG'
+        },
+        city: {
+            description: `Full city name.`,
+            type: 'string',
+            example: 'Barcelona'
+        },
+        ll: {
+            description: `2-tutple with the latitude and longitude coordinates of the city.`,
+            type: 'array',
+            items: {
+                type: 'number'
+            },
+            minItems: 2,
+            maxItems: 2,
+            example: [41.3891, 2.1611]
+        },
+        area: {
+            description: `The approximate accuracy radius (km), around the latitude and longitude.`,
+            type: 'integer',
+            example: 1000
+        },
+        metro: {
+            description: `The metro code of the location if the location is in the US.`,
+            type: 'integer',
+            example: 641
+        },
+        timezone: {
+            description: `Timezone (Country/Zone) from IANA Time Zone Database.`,
+            type: 'string',
+            example: 'Europe/Madrid'
+        }
     },
     required: [
-
+        'address',
+        'range',
+        'country',
+        'eu',
+        'region',
+        'city',
+        'll',
+        'area',
+        'metro',
+        'timezone'
     ]
 };
 ```
@@ -322,13 +626,10 @@ const Ip = {
 
 ```javascript
 const ServerSide = {
+    $id: '/schemas/server-side',
     title: 'Server Side',
     description: ``,
-    properties: {
-
-    },
-    required: [
-
-    ]
+    properties: {},
+    required: []
 };
 ```

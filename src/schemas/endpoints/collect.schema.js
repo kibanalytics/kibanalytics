@@ -5,12 +5,12 @@ module.exports = {
         url: {
             type: 'object',
             properties: {
-                href: { type: 'string' },
-                referrer: { type: 'string' }
+                href: { type: 'string' }
             },
             required: ['href'],
             additionalProperties: false
         },
+        referrer: { type: 'string' },
         event: {
             type: 'object',
             properties: {
@@ -76,6 +76,7 @@ module.exports = {
     required: [
         'tracker_id',
         'url',
+        'referrer',
         'event',
         'device',
         'browser',

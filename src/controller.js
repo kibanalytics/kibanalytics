@@ -131,11 +131,13 @@ module.exports.collect = async (req, res, next) => {
                 hash: url.hash,
                 ...body.url
             },
+            referrer: body.referrer,
             event: event,
             device: {
                 os: parsedUserAgent.os,
                 cpu: parsedUserAgent.cpu,
                 ...parsedUserAgent.device,
+                type: parsedUserAgent.device.type ?? 'desktop', // Default empty device type to 'desktop'
                 ...body.device
             },
             browser: {

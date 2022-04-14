@@ -237,9 +237,9 @@ __webpack_require__.r(__webpack_exports__);
         const body = {
             tracker_id,
             url: {
-                href: currentUrl,
-                referrer: currentRef
+                href: currentUrl
             },
+            referrer: currentRef,
             event: {
                 ts: {
                     kbsStarted: kbsStartedTs,
