@@ -19,10 +19,11 @@ module.exports.ip = (req) => {
         : req.headers['x-forwarded-for'] || req.connection.remoteAddress
     const ipData = lookup(address) || {};
 
-    const ip = {
+    // Convert '0' or '1' string to boolean value
+    ipData.eu = ipData.eu === '1';
+
+    return {
         address,
         ...ipData
     }
-
-    return ip;
 }
