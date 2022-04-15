@@ -199,7 +199,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 (window => {
-    const kbsStartedTs = (new Date()).getTime();
+    const scriptStartedTs = (new Date()).getTime();
 
     const {
         screen,
@@ -242,9 +242,9 @@ __webpack_require__.r(__webpack_exports__);
             referrer: currentRef,
             event: {
                 ts: {
-                    kbsStarted: kbsStartedTs,
+                    scriptStarted: scriptStartedTs,
                     started: eventTs,
-                    kbsStartedDelta: eventTs - kbsStartedTs
+                    scriptEventStartedDelta: eventTs - scriptStartedTs
                 },
                 type,
                 payload
