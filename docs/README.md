@@ -352,15 +352,80 @@ const Device = {
 
 ### Browser
 
+A web browser is application software for accessing the internet or a local website. When a user requests a web page from a particular website, the web browser retrieves the necessary content from a web server and then displays the page on the user's device.
+
 The browser information is extracted from the user agent string using [UAParser.js](https://github.com/faisalman/ua-parser-js) library, from the browser [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API) and from tracker.js custom functions.
 
 ```javascript
 const Browser = {
     $id: '/schemas/browser',
     title: 'Browser',
-    description: ``,
-    properties: {},
-    required: []
+    description: `Information about the user agent browser.`,
+    properties: {
+        name: {
+            description: `Browser name from user agent.`,
+            type: 'string',
+            example: 'Chrome'
+        },
+        version: {
+            description: `Browser version from user agent.`,
+            type: 'string',
+            example: '100.0.4896.79'
+        },
+        majorVersion: {
+            description: `Browser major version from user agent.`,
+            type: 'string',
+            example: '100'
+        },
+        engine: {
+            description: `A browser engine (also known as rendering engine) is a core 
+                          software component of every major web browser. The primary 
+                          job of a browser engine is to transform HTML documents and other 
+                          resources of a web page into an interactive visual representation 
+                          on a user's device.`,
+            type: 'object',
+            properties: {
+                name: {
+                    description: `Engine name from user agent.`,
+                    type: 'string',
+                    example: 'Blink'
+                },
+                version: {
+                    description: `Engine version from user agent.`,
+                    type: 'string',
+                    example: '100.0.4896.79'
+                },
+            },
+            required: [
+                'name',
+                'version'
+            ]
+        },
+        language: {
+            description: `Browser interface language from Navigator.language Web API.`,
+            type: 'string',
+            example: 'ro'
+        },
+        cookies: {
+            description: `Flag indicating if cookies is enabled.`,
+            type: 'boolean',
+            example: true
+        },
+        adBlock: {
+            description: `Flag indicating if ad block is enabled.`,
+            type: 'boolean',
+            example: false
+        }
+    },
+    required: [
+        'name',
+        'version',
+        'majorVersion',
+        'engine',
+        'language',
+        'cookies',
+        'adBlock'
+    ]
 };
 ```
 
