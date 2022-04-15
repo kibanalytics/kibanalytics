@@ -1,7 +1,7 @@
 require('dotenv').config();
 
-const os = require('os')
-const cluster = require('cluster')
+const os = require('os');
+const cluster = require('cluster');
 const logger = require('./src/logger');
 const redisClient = require('./src/redis-client');
 const express = require('express');
@@ -25,7 +25,7 @@ const init = async () => {
 
     app.use(expressWinston.logger({
         winstonInstance: logger,
-        meta: false,
+        meta: true,
         expressFormat: true,
         colorize: true
     }));
