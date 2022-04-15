@@ -4,7 +4,7 @@ import classListener from './class-listener.client';
 import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client.js';
 
 (window => {
-    const kbsStartedTs = (new Date()).getTime();
+    const scriptStartedTs = (new Date()).getTime();
 
     const {
         screen,
@@ -47,9 +47,9 @@ import { adBlockEnabled, cookiesEnabled, doNotTrack, hook } from './utils.client
             referrer: currentRef,
             event: {
                 ts: {
-                    kbsStarted: kbsStartedTs,
+                    scriptStarted: scriptStartedTs,
                     started: eventTs,
-                    kbsStartedDelta: eventTs - kbsStartedTs
+                    scriptEventStartedDelta: eventTs - scriptStartedTs
                 },
                 type,
                 payload

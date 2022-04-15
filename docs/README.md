@@ -24,25 +24,25 @@ Kibanalytics will look for a .env file at the root of the project folder to appl
 Use .env.example as base for your environment variables setup.
 :::
 
-| Name                     | Type           | Allowed Values          | Description  |
-|:------------------------ |:--------------:| -----------------------:| ------------:|
-| NODE_ENV                 | string         | development, production |  |
-| NODE_CLUSTER             | int            |   0, 1                  |  |
-| EXPRESS_PORT             | int            |   -                     |  |
-| EXPRESS_HELMET           | int            |   0, 1                  |  |
-| EXPRESS_CORS             | int            |   0, 1                  |  |
-| EXPRESS_ALLOWED_ORIGINS  | int            |   -                     |  |
-| EXPRESS_GZIP             | int            |   0, 1                  |  |
-| EXPRESS_SESSION_ID       | int            |   -                     |  |
-| EXPRESS_SESSION_SECRET   | int            |   -                     |  |
-| SENTRY_DSN               | int            |   -                     |  |
-| REDIS_HOST               | int            |   -                     |  |
-| REDIS_USERNAME           | int            |   -                     |  |
-| REDIS_PASSWORD           | int            |   -                     |  |
-| REDIS_URIS               | int            |   -                     |  |
-| TRACKING_KEY             | int            |   -                     |  |
-| ELASTICSEARCH_URIS       | int            |   -                     |  |
-| VALIDATE_JSON_SCHEMA     | int            |   0, 1                  |  |
+| Name                    |  Type  |          Allowed Values | Description |
+|:------------------------|:------:|------------------------:|------------:|
+| NODE_ENV                | string | development, production |             |
+| NODE_CLUSTER            |  int   |                    0, 1 |             |
+| EXPRESS_PORT            |  int   |                       - |             |
+| EXPRESS_HELMET          |  int   |                    0, 1 |             |
+| EXPRESS_CORS            |  int   |                    0, 1 |             |
+| EXPRESS_ALLOWED_ORIGINS |  int   |                       - |             |
+| EXPRESS_GZIP            |  int   |                    0, 1 |             |
+| EXPRESS_SESSION_ID      |  int   |                       - |             |
+| EXPRESS_SESSION_SECRET  |  int   |                       - |             |
+| SENTRY_DSN              |  int   |                       - |             |
+| REDIS_HOST              |  int   |                       - |             |
+| REDIS_USERNAME          |  int   |                       - |             |
+| REDIS_PASSWORD          |  int   |                       - |             |
+| REDIS_URIS              |  int   |                       - |             |
+| TRACKING_KEY            |  int   |                       - |             |
+| ELASTICSEARCH_URIS      |  int   |                       - |             |
+| VALIDATE_JSON_SCHEMA    |  int   |                    0, 1 |             |
 
 ### Docker-Compose
 
@@ -73,14 +73,16 @@ Use .env.example as base for your environment variables setup.
 </html>
 ```
 
-| Name                     | Type           | Allowed Values          | Description  |
-|:------------------------ |:--------------:| -----------------------:| ------------:|
-| data-tracker-id          | string         |                         |  |
-| data-server-url          | string         |                         |  |
+| Name            |  Type  | Allowed Values | Description |
+|:----------------|:------:|---------------:|------------:|
+| data-tracker-id | string |                |             |
+| data-server-url | string |                |             |
 
 ## Schema
 
 ### Collected Data
+
+This is the document structure to be saved in the dababase with all collect data for every dispatched event from the client.
 
 ```javascript
 const CollectedData = {
@@ -127,7 +129,8 @@ const CollectedData = {
         'session',
         'ip',
         'serverSide'
-    ]
+    ],
+    additionalProperties: false
 };
 ```
 
@@ -203,17 +206,24 @@ const Url = {
         'pathname',
         'search',
         'hash'
-    ]
+    ],
+    additionalProperties: false
 };
 ```
 
 ### Event
 
+By default, Kibanalytics measures the traffic on the website by tracking pageview events. 
+
+But if you want to track more specific interactions like form submissions, video views, user interactions etc., you need to programmatically dispatch custom events.
+
+Custom events accept any kind of custom payloads and these can be optionally validated by a schema.
+
 ```javascript
 const Event = {
     $id: '/schemas/event',
     title: 'Event',
-    description: ``,
+    description: `Event dispatched by the tracker client lib.`,
     properties: {
         _id: {
             description: `Unique RFC4122 V4 identifier.`,
@@ -222,10 +232,72 @@ const Event = {
             maxLength: 36,
             example: '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'
         },
+        type: {
+            description: `Event type.`,
+            type: 'string',
+            example: 'pageview'
+        },
+        ts: {
+            description: `Group of Date/Time timestamps & deltas.`,
+            type: 'object',
+            properties: {
+                started: {
+                    description: `Date/Time the event started represented by the number of 
+                                  milliseconds since the ECMAScript epoch.`,
+                    type: 'string',
+                    minimum: 0,
+                    example: 1649900818013 // Wed Apr 13 2022 22:46:58 GMT-0300
+                },
+                scriptStarted: {
+                    description: `Date/Time the kbs script started represented by the number of 
+                                  milliseconds since the ECMAScript epoch.`,
+                    type: 'string',
+                    minimum: 0,
+                    example: 1649900818013 // Wed Apr 13 2022 22:46:58 GMT-0300
+                },
+                scriptEventStartedDelta: {
+                    description: `Delta in milliseconds between the event Date/Time 
+                                  and the kbs script started Date/Time.`,
+                    type: 'string',         
+                    minimum: 0,
+                    example: 300000 // 5 minutes
+                }
+            },
+            required: [
+                'started',
+                'scriptStarted',
+                'scriptEventStartedDelta'
+            ],
+            additionalProperties: false
+        },
+        payload: {
+            description: `Any custom data related to the event. Can be any kind of structure,
+                          and optionally validated by a custom schema.`,
+            type: 'object',
+            properties: {},
+            required: [],
+            additionalProperties: true,
+            example: {
+                foo: 'bar',
+                element: {
+                    tagName: 'BUTTON'
+                },
+                class: {
+                    value: 'button02',
+                    type: 'click',
+                    prefix: 'kbs',
+                    name: 'kbs-click-button02'
+                }
+            }
+        }
     },
     required: [
-        '_id'
-    ]
+        '_id',
+        'type',
+        'ts',
+        'payload'
+    ],
+    additionalProperties: false
 };
 ```
 
@@ -287,7 +359,8 @@ const Device = {
             },
             required: [
                 'architecture'
-            ]
+            ],
+            additionalProperties: false
         },
         platform: {
             description: `Device platform from Navigator.platform Web API. Most browsers, including 
@@ -315,7 +388,8 @@ const Device = {
             required: [
                 'name',
                 'version'
-            ]
+            ],
+            additionalProperties: false
         },
         screen: {
             description: `Device screen resolution from Screen Web API.`,
@@ -335,7 +409,8 @@ const Device = {
             required: [
                 'width',
                 'height'
-            ]
+            ],
+            additionalProperties: false
         },
     },
     required: [
@@ -346,7 +421,8 @@ const Device = {
         'platform',
         'os',
         'screen'
-    ]
+    ],
+    additionalProperties: false
 };
 ```
 
@@ -399,7 +475,8 @@ const Browser = {
             required: [
                 'name',
                 'version'
-            ]
+            ],
+            additionalProperties: false
         },
         language: {
             description: `Browser interface language from Navigator.language Web API.`,
@@ -425,7 +502,8 @@ const Browser = {
         'language',
         'cookies',
         'adBlock'
-    ]
+    ],
+    additionalProperties: false
 };
 ```
 
@@ -480,12 +558,16 @@ const User = {
             type: 'integer',
             minimum: 0,
             example: 5
-        },
+        }
     },
     required: [
         '_id',
-        'new'
-    ]
+        'new',
+        'sessions',
+        'events',
+        'views',
+    ],
+    additionalProperties: false
 };
 ```
 
@@ -537,12 +619,35 @@ const Session = {
             exclusiveMinimum: 0,
             example: 10
         },
+        eventsFlow: {
+            description: `All events fired during the current session 
+                          sorted in order of occurrence.`,
+            type: 'array',
+            items: { $ref: '/schemas/event' },
+            minItems: 1
+        },
+        lastEvent: {
+            description: `Event prior to current event.`,
+            $ref: '/schemas/event'
+        },
         views: {
             description: `Page view counter. Will increases the value on 'pageview' 
                           event type received by the back-end in the session lifetime.`,
             type: 'integer',
             minimum: 0,
             example: 5
+        },
+        viewsFlow: {
+            description: `All href's from page view events fired during the current session 
+                          sorted in order of occurrence.`,
+            type: 'array',
+            items: {
+                type: 'string'
+            },
+            example: [
+                'https://www.virail.ro/',
+                'https://www.virail.ro/zboruri-constanta-cluj_napoca'
+            ]
         },
         ts: {
             description: `Group of Date/Time timestamps & deltas.`,
@@ -556,7 +661,7 @@ const Session = {
                     example: 1649900818013 // Wed Apr 13 2022 22:46:58 GMT-0300
                 },
                 currentLastEventStartedDelta: {
-                    description: `Delta in miliseconds between the current session event Date/Time 
+                    description: `Delta in milliseconds between the current session event Date/Time 
                                   and the last session event Date/Time.`,
                     type: 'integer',
                     minimum: 0,
@@ -566,15 +671,20 @@ const Session = {
             required: [
                 'started',
                 'currentLastEventStartedDelta'
-            ]
+            ],
+            additionalProperties: false
         }
     },
     required: [
         '_id',
         'new',
         'events',
-        'views'
-    ]
+        'eventsFlow',
+        'views',
+        'viewsFlow',
+        'ts'
+    ],
+    additionalProperties: false
 };
 ```
 
@@ -683,18 +793,153 @@ const Ip = {
         'area',
         'metro',
         'timezone'
-    ]
+    ],
+    additionalProperties: false
 };
 ```
 
 ### Server Side
 
+Any custom data and optionally validated by a custom schema.
+
 ```javascript
 const ServerSide = {
     $id: '/schemas/server-side',
     title: 'Server Side',
-    description: ``,
+    description: `Server side custom data.`,
     properties: {},
-    required: []
+    required: [],
+    additionalProperties: false
 };
+```
+
+## Data Example
+
+JSON Data from a pageview event saved to Kibanalytics database.
+
+::: warning
+It's not possible to guarantee the properties order of the output JSON object.
+:::
+
+```json
+{
+  "session": {
+    "ts": {
+      "started": 1649986123720,
+      "currentLastEventStartedDelta": 25445
+    },
+    "views": 2,
+    "events": 2,
+    "new": false,
+    "viewsFlow": [
+      "https://www.virail.ca/trains-montreal-trois_rivieres",
+      "https://www.virail.ca/trains-montreal-trois_rivieres"
+    ],
+    "lastEvent": {
+      "ts": {
+        "scriptEventStartedDelta": 3272,
+        "started": 1649986126992,
+        "scriptStarted": 1649986123720
+      },
+      "payload": {},
+      "type": "pageview",
+      "_id": "abc77ea0-031b-4d2b-a278-5f847a592bed"
+    },
+    "eventsFlow": [
+      {
+        "ts": {
+          "scriptEventStartedDelta": 3272,
+          "started": 1649986126992,
+          "scriptStarted": 1649986123720
+        },
+        "payload": {},
+        "href": "https://www.virail.ca/trains-montreal-trois_rivieres",
+        "type": "pageview",
+        "_id": "abc77ea0-031b-4d2b-a278-5f847a592bed"
+      },
+      {
+        "ts": {
+          "scriptEventStartedDelta": 2164,
+          "started": 1649986152437,
+          "scriptStarted": 1649986150273
+        },
+        "payload": {},
+        "href": "https://www.virail.ca/trains-montreal-trois_rivieres",
+        "type": "pageview",
+        "_id": "59909535-76d7-4897-99e4-14e56ab1ef56"
+      }
+    ],
+    "_id": "693f43b9-1e76-44e0-993d-2cef2c2fa653"
+  },
+  "browser": {
+    "engine": {
+      "name": "Blink",
+      "version": "100.0.4896.79"
+    },
+    "name": "Chrome",
+    "language": "fr",
+    "adBlock": false,
+    "cookies": true,
+    "major": "100",
+    "version": "100.0.4896.79"
+  },
+  "user": {
+    "views": 2,
+    "sessions": 1,
+    "events": 2,
+    "new": false,
+    "_id": "7289a9f2-f195-407d-8ed4-275d4697f795"
+  },
+  "tracker_id": "N7TXY7",
+  "userAgent": "Mozilla/5.0 (Linux; Android 10; SM-G960U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Mobile Safari/537.36",
+  "referrer": "https://www.google.com/",
+  "device": {
+    "os": {
+      "name": "Android",
+      "version": "10"
+    },
+    "screen": {
+      "width": 360,
+      "height": 740
+    },
+    "vendor": "Samsung",
+    "cpu": {},
+    "model": "SM-G960U",
+    "type": "mobile",
+    "platform": "Linux armv8l"
+  },
+  "url": {
+    "search": "",
+    "hostname": "www.virail.ca",
+    "hash": "",
+    "href": "https://www.virail.ca/trains-montreal-trois_rivieres",
+    "pathname": "/trains-montreal-trois_rivieres"
+  },
+  "event": {
+    "ts": {
+      "scriptEventStartedDelta": 2164,
+      "started": 1649986152437,
+      "scriptStarted": 1649986150273
+    },
+    "payload": {},
+    "type": "pageview",
+    "_id": "59909535-76d7-4897-99e4-14e56ab1ef56"
+  },
+  "ip": {
+    "metro": 0,
+    "city": "Saint-Jean-de-l'Ile-d'Orleans",
+    "region": "QC",
+    "range": "",
+    "country": "CA",
+    "area": 100,
+    "address": "2001:56b:bce8:ca00:40de:6b6d:33c9:459a",
+    "timezone": "America/Toronto",
+    "eu": false,
+    "ll": [
+      46.9233,
+      -70.8968
+    ]
+  },
+  "serverSide": {}
+}
 ```

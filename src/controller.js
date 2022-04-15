@@ -90,7 +90,7 @@ module.exports.collect = async (req, res, next) => {
             req.session.views = 0;
             req.session.viewsFlow = [];
             req.session.ts = {
-                started: body.event.ts.kbsStarted
+                started: body.event.ts.scriptStarted
             };
         }
 

@@ -17,14 +17,14 @@ module.exports = {
                 ts: {
                     type: 'object',
                     properties: {
-                        kbsStarted: { type: 'number' },
+                        scriptStarted: { type: 'number' },
                         started: { type: 'number' },
-                        kbsStartedDelta: { type: 'number' }
+                        scriptEventStartedDelta: { type: 'number' }
                     },
                     required: [
-                        'kbsStarted',
+                        'scriptStarted',
                         'started',
-                        'kbsStartedDelta'
+                        'scriptEventStartedDelta'
                     ]
                 },
                 type: { type: 'string' },
