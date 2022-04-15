@@ -25,7 +25,7 @@ const init = async () => {
 
     app.use(expressWinston.logger({
         winstonInstance: logger,
-        meta: true,
+        meta: false,
         expressFormat: true,
         colorize: true
     }));
