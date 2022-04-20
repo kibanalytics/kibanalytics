@@ -15,7 +15,7 @@ module.exports = {
                 'type',
                 'value',
             ],
-            additionalProperties: false
+            additionalProperties: true
         },
         element: {
             type: 'object',
@@ -23,13 +23,10 @@ module.exports = {
                 tagName: { type: 'string' }
             },
             required: ['tagName'],
-            additionalProperties: false
+            additionalProperties: true
         },
         foo: { type: 'string' }
     },
-    required: [
-        'class',
-        'element'
-    ],
-    additionalProperties: false
+    required: [],
+    additionalProperties: true
 }

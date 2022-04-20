@@ -62,11 +62,19 @@ const isJsonString = (str) => {
     return true;
 }
 
+const getClassPrefixRegExp = (prefix) => {
+    return new RegExp(`^${prefix}-([a-z]+)-([\\w]+[\\w-]*)$`);
+}
+
+const getEventClassSelector = (prefix) => `[class*=\'${prefix}-\']`;
+
 export {
     hook,
     doNotTrack,
     adBlockEnabled,
     cookiesEnabled,
     getPrefixedAttributes,
+    getClassPrefixRegExp,
+    getEventClassSelector,
     isJsonString
 };
