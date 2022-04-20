@@ -82,7 +82,7 @@ Use .env.example as base for your environment variables setup.
 
 ### Collected Data
 
-This is the document structure to be saved in the dababase with all collect data for every dispatched event from the client.
+This is the document structure to be saved in the database with all collect data for every dispatched event from the client.
 
 ```javascript
 const CollectedData = {
