@@ -1,7 +1,6 @@
 module.exports = {
     type: 'object',
     properties: {
-        tracker_id: { type: 'string' },
         url: {
             type: 'object',
             properties: {
@@ -74,7 +73,6 @@ module.exports = {
         }
     },
     required: [
-        'tracker_id',
         'url',
         'referrer',
         'event',

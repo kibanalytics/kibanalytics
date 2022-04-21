@@ -217,11 +217,13 @@ __webpack_require__.r(__webpack_exports__);
         history,
     } = window;
 
-    const script = document.querySelector('script[data-tracker-id]');
-    if (!script) throw new Error('data-tracker-id not found');
+    /*
+        Does not work with modules <script type="module">
+        if we change this script to a module on the future
+     */
+    const script = document.currentScript;
 
     const attr = script.getAttribute.bind(script);
-    const tracker_id = attr('data-tracker-id');
     const listeners = new Map();
 
     let serverUrl = attr('data-server-url') || `${location.origin}/collect`; // default value
@@ -241,7 +243,6 @@ __webpack_require__.r(__webpack_exports__);
 
         const url = `${serverUrl}`;
         const body = {
-            tracker_id,
             url: {
                 href: currentUrl
             },
@@ -285,7 +286,6 @@ __webpack_require__.r(__webpack_exports__);
                 The sendBeacon() method returns true if the user agent successfully queued the data for transfer.
                 Otherwise, it returns false.
              */
-
             return (queued)
                 ? { status: 'success', event_id: 'sendBeacon' }
                 : { status: 'error', message: 'User agent failed to queue the data transfer' };
