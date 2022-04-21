@@ -1,10 +1,12 @@
 const { v4: uuidv4 } = require('uuid');
 const redisClient = require('./redis-client');
 const validator = require('./validator');
-const uaParser = require('ua-parser-js');
-const metrics = require('./metrics');
 const validateCollectEndpoint = validator.getSchema('collectEndpoint');
+const plugins = require('./plugins');
 
+/*
+    @TODO Maybe is time to create a config.json file as .env file is starting to get to big
+ */
 const EVENT_FLOW_WITH_PAYLOAD = true; // @TODO make this configurable
 const SESSION_DURATION = 30 * 60000; // 30 minutes @TODO make this configurable
 
@@ -120,10 +122,8 @@ module.exports.collect = async (req, res, next) => {
         }
 
         const url = new URL(body.url.href);
-        const parsedUserAgent = uaParser(req.headers['user-agent']);
 
         const data = {
-            tracker_id: body.tracker_id,
             url: {
                 hostname: url.hostname,
                 pathname: url.pathname,
@@ -133,18 +133,6 @@ module.exports.collect = async (req, res, next) => {
             },
             referrer: body.referrer,
             event: event,
-            device: {
-                os: parsedUserAgent.os,
-                cpu: parsedUserAgent.cpu,
-                ...parsedUserAgent.device,
-                type: parsedUserAgent.device.type ?? 'desktop', // Default empty device type to 'desktop'
-                ...body.device
-            },
-            browser: {
-                engine: parsedUserAgent.engine,
-                ...parsedUserAgent.browser,
-                ...body.browser
-            },
             userAgent: req.headers['user-agent'],
             user: session.user,
             session: {
@@ -152,17 +140,18 @@ module.exports.collect = async (req, res, next) => {
                 new: session.new,
                 events: session.events,
                 eventsFlow: session.eventsFlow,
-                lastEvent: session.lastEvent, // @TODO lastEvent now is redundant with eventsFlow, the last item of the array is the lastEvent
+                lastEvent: session.lastEvent,
                 views: session.views,
                 viewsFlow: session.viewsFlow,
                 ts: req.session.ts
             },
-            ip: metrics.ip(req),
             serverSide: body.serverSide // @TODO maybe changing property name to custom ?
         };
 
-        session.lastEvent = data.event;
+        req.data = data; // data context reference for plugins
+        for (const plugin of plugins) plugin(req);
 
+        session.lastEvent = data.event;
         await redisClient.rPush(process.env.TRACKING_KEY, JSON.stringify(data));
 
         res.json({ status: 'success', event_id: data.event._id });
