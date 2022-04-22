@@ -25,7 +25,7 @@ module.exports.collect = async (req, res, next) => {
 
         const eventType = body.event.type;
 
-        if (!!+process.env.VALIDATE_JSON_SCHEMA && eventType !== 'pageview') {
+        if (!!+process.env.EXPRESS_VALIDATE_JSON_SCHEMA && eventType !== 'pageview') {
             const validate = validator.getSchema(eventType);
 
             if (validate === undefined) {
