@@ -114,6 +114,7 @@ import {
         return response;
     };
 
+    // @TODO keeps the reference, allow a public method to remove the event listner
     const trackEvent = ({ selector, type, data, label }) => {
         const element = document.querySelector(selector);
         if (!element) throw new Error(`Element witg selector ${selector} not found.`);
@@ -243,9 +244,6 @@ import {
         set callback(fn) {
             callback = (typeof fn === 'function') ? fn : null;
             return callback;
-        },
-        get listeners() {
-            return listeners;
         },
         track,
         trackEvent,
