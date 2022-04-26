@@ -44,7 +44,6 @@ module.exports.collect = async (req, res, next) => {
                 If user exists, we have a last event, then check the delta between the current event ts
                 and the last event ts. If delta > SESSION_DURATION, generate a new session.
             */
-            req.session.user.new = false;
             req.session.ts.currentLastEventStartedDelta = (req.session.lastEvent) ?
                 body.event.ts.started - req.session.lastEvent.ts.started
                 : null;
@@ -52,6 +51,7 @@ module.exports.collect = async (req, res, next) => {
             if (req.session.ts.currentLastEventStartedDelta > SESSION_DURATION) {
                 // Store user pointer to apply to regenerated session
                 const user = req.session.user;
+                user.new = false;
 
                 // Promise version of session.regenerate fn
                 const regenerate = () => new Promise((resolve, reject) => {
