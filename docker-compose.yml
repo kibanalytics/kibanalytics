@@ -21,7 +21,7 @@ services:
     working_dir: /app
     command: node index.js
     ports:
-      - ${EXPRESS_PORT}:${EXPRESS_PORT}
+      - ${NODE_LISTEN:-127.0.0.1:3000:3000}
 
   logstash:
     container_name: kibanalytics.logstash
