@@ -1082,14 +1082,14 @@ const Ip = {
             example: 'Barcelona'
         },
         ll: {
-            description: `2-tutple with the latitude and longitude coordinates of the city.`,
+            description: `2-tutple with the longitude and latitude coordinates of the city.`,
             type: 'array',
             items: {
                 type: 'number'
             },
             minItems: 2,
             maxItems: 2,
-            example: [41.3891, 2.1611]
+            example: [2.1611, 41.3891]
         },
         area: {
             description: `The approximate accuracy radius (km), around the latitude and longitude.`,

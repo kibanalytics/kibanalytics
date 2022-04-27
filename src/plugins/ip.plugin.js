@@ -19,6 +19,7 @@ module.exports = (req) => {
 
     // Convert '0' or '1' string to boolean value
     ipData.eu = ipData.eu === '1';
+    ipData.ll = ipData.ll.reverse();
 
     req.data.ip = {
         address,
