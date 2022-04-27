@@ -19,6 +19,14 @@ module.exports = (req) => {
 
     // Convert '0' or '1' string to boolean value
     ipData.eu = ipData.eu === '1';
+
+    /*
+        Elasticsearch Geopoint Field Type
+        Geopoint expressed as an array with the format: [lon, lat]
+
+        geoip-lite, by default, provide coordinates as [lat, lon], so we have to reverse for
+        Elasticsearch.
+     */
     ipData.ll = ipData.ll.reverse();
 
     req.data.ip = {
