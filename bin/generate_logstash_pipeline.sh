@@ -100,6 +100,14 @@ EOF
           index  => \"tracker-%{+YYYY.MM.dd}\"
           action => \"create\"
         }
+
+        elasticsearch {
+          hosts  => [ \"$( echo ${ELASTICSEARCH_URIS} | sed 's/,/", "/g')\" ]
+          index => \"last-tracker-event\"
+          action => \"update\"
+          doc_as_upsert => true
+          document_id => \"%{[user][_id]}\"
+        }
     ";
 cat <<EOF
     }
