@@ -56,6 +56,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "adBlockEnabled": () => (/* binding */ adBlockEnabled),
 /* harmony export */   "cookiesEnabled": () => (/* binding */ cookiesEnabled),
 /* harmony export */   "doNotTrack": () => (/* binding */ doNotTrack),
+/* harmony export */   "getClassPrefixRegExp": () => (/* binding */ getClassPrefixRegExp),
+/* harmony export */   "getEventClassSelector": () => (/* binding */ getEventClassSelector),
 /* harmony export */   "getPrefixedAttributes": () => (/* binding */ getPrefixedAttributes),
 /* harmony export */   "hook": () => (/* binding */ hook),
 /* harmony export */   "isJsonString": () => (/* binding */ isJsonString)
@@ -123,6 +125,12 @@ const isJsonString = (str) => {
     }
     return true;
 }
+
+const getClassPrefixRegExp = (prefix) => {
+    return new RegExp(`^${prefix}-([a-z]+)-([\\w]+[\\w-]*)$`);
+}
+
+const getEventClassSelector = (prefix) => `[class*=\'${prefix}-\']`;
 
 
 
@@ -209,23 +217,23 @@ __webpack_require__.r(__webpack_exports__);
         history,
     } = window;
 
-    const script = document.querySelector('script[data-tracker-id]');
-    if (!script) throw new Error('data-tracker-id not found');
-
     /*
-        @TODO prefix html attributes with kbs. For example, data-kbs-*. This is a breaking change.
+        Does not work with modules <script type="module">
+        if we change this script to a module on the future
      */
-    const attr = script.getAttribute.bind(script);
-    const tracker_id = attr('data-tracker-id');
-    const serverUrl = attr('data-server-url') || `${location.origin}/collect`;
+    const script = document.currentScript;
 
-    const eventClass = /^kbs-([a-z]+)-([\w]+[\w-]*)$/;
-    const eventSelector = '[class*=\'kbs-\']';
-    const listeners = {};
+    const attr = script.getAttribute.bind(script);
+    const listeners = new Map();
+
+    let serverUrl = attr('data-server-url') || `${location.origin}/collect`; // default value
+    let serverSideData = {};
+    let eventClassPrefix = 'kbs'; // default value
+    let eventClassRegex = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.getClassPrefixRegExp)(eventClassPrefix);
+    let eventClassSelector = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.getEventClassSelector)(eventClassPrefix);
+    let callback = null;
     let currentUrl = location.href;
     let currentRef = document.referrer;
-    let callback = null;
-    let serverSideData = {};
 
     /* Collect metrics */
 
@@ -235,7 +243,6 @@ __webpack_require__.r(__webpack_exports__);
 
         const url = `${serverUrl}`;
         const body = {
-            tracker_id,
             url: {
                 href: currentUrl
             },
@@ -279,7 +286,6 @@ __webpack_require__.r(__webpack_exports__);
                 The sendBeacon() method returns true if the user agent successfully queued the data for transfer.
                 Otherwise, it returns false.
              */
-
             return (queued)
                 ? { status: 'success', event_id: 'sendBeacon' }
                 : { status: 'error', message: 'User agent failed to queue the data transfer' };
@@ -295,31 +301,74 @@ __webpack_require__.r(__webpack_exports__);
         }).then(response => response.json());
     };
 
-    const trackEvent = async (type = 'custom', data = {}, options = {}) => {
+    /* Handle events */
+
+    const track = async (type = 'custom', data = {}, options = {}) => {
         const response = await collect(type, data, options.sendBeacon);
 
         if (callback) callback(response);
         return response;
     };
 
-    /* Handle events */
+    const trackEvent = ({ selector, type, data, label }) => {
+        const element = document.querySelector(selector);
+        if (!element) throw new Error(`Element witg selector ${selector} not found.`);
 
-    const addEvents = node => {
-        const elements = node.querySelectorAll(eventSelector);
-        Array.prototype.forEach.call(elements, addEvent);
+        element.addEventListener(type, () => track(label ?? type, data), true);
     };
 
-    const addEvent = element => {
+    const trackEventList = (list) => {
+        for (const event of list) {
+            trackEvent(event);
+        }
+    };
+
+    const trackEventListUrl = async (url) => {
+        const list = await fetch(url, {
+            method: 'get',
+            headers: {
+                'content-type': 'application/json'
+            }
+        }).then(response => response.json());
+
+        trackEventList(list);
+    };
+
+    /* Handle class events */
+
+    const addClassEvents = node => {
+        const elements = node.querySelectorAll(eventClassSelector);
+        Array.prototype.forEach.call(elements, addClassEvent);
+    };
+
+    const removeClassEvents = node => {
+        const elements = node.querySelectorAll(eventClassSelector);
+        Array.prototype.forEach.call(elements, removeClassEvent);
+    };
+
+    const addClassEvent = element => {
         const classes = element.getAttribute('class')?.split(' ');
         if (!classes) return;
 
         for (const className of classes) {
-            if (!eventClass.test(className)) continue;
+            if (!eventClassRegex.test(className)) continue;
 
             const [prefix, type, value] = className.split('-');
-            listeners[className] = listeners[className] || (0,_class_listener_client__WEBPACK_IMPORTED_MODULE_0__["default"])(element, className, prefix, type, value, trackEvent);
+            if (!listeners.has(className)) listeners.set(className, (0,_class_listener_client__WEBPACK_IMPORTED_MODULE_0__["default"])(element, className, prefix, type, value, track));
 
-            element.addEventListener(type, listeners[className], true);
+            element.addEventListener(type, listeners.get(className), true);
+        }
+    };
+
+    const removeClassEvent = element => {
+        const classes = element.getAttribute('class')?.split(' ');
+        if (!classes) return;
+
+        for (const className of classes) {
+            const type = className.split('-')[1];
+
+            element.removeEventListener(type, listeners.get(className), true);
+            listeners.delete(className);
         }
     };
 
@@ -332,7 +381,7 @@ __webpack_require__.r(__webpack_exports__);
         currentUrl = location.href;
 
         if (currentUrl !== currentRef) {
-            trackEvent('pageview');
+            track('pageview');
         }
     };
 
@@ -340,8 +389,8 @@ __webpack_require__.r(__webpack_exports__);
         const monitorMutate = mutations => {
             mutations.forEach(mutation => {
                 const element = mutation.target;
-                addEvent(element);
-                addEvents(element);
+                addClassEvent(element);
+                addClassEvents(element);
             });
         };
 
@@ -353,21 +402,51 @@ __webpack_require__.r(__webpack_exports__);
 
     /* Global */
 
+    // @TODO function to set all configurations at once
+    // @TODO maybe transform this object to a JavaScript class
+    // @TODO delay inicialization by html property, allowing initialization by JavaScript
+
     const kbs = {
+        get serverUrl() {
+            return serverUrl;
+        },
+        set serverUrl(url) {
+            serverUrl = url;
+            return serverUrl;
+        },
         get serverSideData() {
             return serverSideData
         },
         set serverSideData(obj) {
-            if (typeof obj === 'object') serverSideData = obj;
+            serverSideData = (typeof obj === 'object') ? obj : {};
+        },
+        get eventClassPrefix() {
+            return eventClassPrefix;
+        },
+        set eventClassPrefix(prefix) {
+            removeClassEvents(document);
+
+            eventClassPrefix = prefix;
+            eventClassRegex = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.getClassPrefixRegExp)(prefix);
+            eventClassSelector = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.getEventClassSelector)(prefix);
+            addClassEvents(document);
+
+            return eventClassPrefix;
         },
         get callback() {
             return callback;
         },
         set callback(fn) {
-            if (typeof fn === 'function') callback = fn;
+            callback = (typeof fn === 'function') ? fn : null;
             return callback;
         },
-        trackEvent
+        get listeners() {
+            return listeners;
+        },
+        track,
+        trackEvent,
+        trackEventList,
+        trackEventListUrl
     };
     Object.freeze(kbs);
 
@@ -383,8 +462,8 @@ __webpack_require__.r(__webpack_exports__);
 
         const update = () => {
             if (document.readyState === 'complete') {
-                trackEvent('pageview');
-                addEvents(document);
+                track('pageview');
+                addClassEvents(document);
                 observeDocument();
             }
         };

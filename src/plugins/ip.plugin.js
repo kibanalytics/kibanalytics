@@ -1,6 +1,6 @@
 const { lookup } = require('geoip-lite');
 
-module.exports.ip = (req) => {
+module.exports = (req) => {
     /*
         geoip-lite includes the GeoLite database from MaxMind. This database is not the most accurate database
         available, however it is the best available for free. You can use the commercial GeoIP database from
@@ -12,18 +12,25 @@ module.exports.ip = (req) => {
         just hardcode your IP address in the ip variable.
      */
 
-    // @TODO behind cloudflare or not flag
-
     const address = process.env.NODE_ENV === 'development'
         ? '177.170.250.182'
-        : req.headers['x-forwarded-for'] || req.connection.remoteAddress
+        : req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress
     const ipData = lookup(address) || {};
 
     // Convert '0' or '1' string to boolean value
     ipData.eu = ipData.eu === '1';
 
-    return {
+    /*
+        Elasticsearch Geopoint Field Type
+        Geopoint expressed as an array with the format: [lon, lat]
+
+        geoip-lite, by default, provide coordinates as [lat, lon], so we have to reverse for
+        Elasticsearch.
+     */
+    ipData.ll = ipData.ll.reverse();
+
+    req.data.ip = {
         address,
         ...ipData
-    }
+    };
 }
