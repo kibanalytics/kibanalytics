@@ -27,7 +27,7 @@ module.exports = (req) => {
         geoip-lite, by default, provide coordinates as [lat, lon], so we have to reverse for
         Elasticsearch.
      */
-    ipData.ll = ipData.ll.reverse();
+    ipData.ll = ipData?.ll?.reverse();
 
     req.data.ip = {
         address,
