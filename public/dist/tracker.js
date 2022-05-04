@@ -271,6 +271,9 @@ __webpack_require__.r(__webpack_exports__);
             serverSide: serverSideData
         };
 
+        const session_id = localStorage.getItem('kbs_session_id');
+        if (session_id) body.session = { _id: session_id };
+
         if (sendBeacon) {
             /*
                 A problem with sending analytics is that a site often wants to send analytics when the user
@@ -291,7 +294,7 @@ __webpack_require__.r(__webpack_exports__);
                 : { status: 'error', message: 'User agent failed to queue the data transfer' };
         }
 
-        return await fetch(url, {
+        const response = await fetch(url, {
             method: 'post',
             headers: {
                 'content-type': 'application/json'
@@ -299,6 +302,10 @@ __webpack_require__.r(__webpack_exports__);
             body: JSON.stringify(body),
             credentials: 'include'
         }).then(response => response.json());
+
+        localStorage.setItem('kbs_session_id', response.session_id);
+
+        return response;
     };
 
     /* Handle events */
@@ -310,6 +317,7 @@ __webpack_require__.r(__webpack_exports__);
         return response;
     };
 
+    // @TODO keeps the reference, allow a public method to remove the event listner
     const trackEvent = ({ selector, type, data, label }) => {
         const element = document.querySelector(selector);
         if (!element) throw new Error(`Element witg selector ${selector} not found.`);
@@ -439,9 +447,6 @@ __webpack_require__.r(__webpack_exports__);
         set callback(fn) {
             callback = (typeof fn === 'function') ? fn : null;
             return callback;
-        },
-        get listeners() {
-            return listeners;
         },
         track,
         trackEvent,
