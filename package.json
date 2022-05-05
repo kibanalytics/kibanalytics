@@ -25,6 +25,7 @@
     "express-winston": "^4.2.0",
     "geoip-lite": "^1.4.4",
     "helmet": "^5.0.2",
+    "isbot": "^3.4.6",
     "redis": "^4.0.4",
     "ua-parser-js": "^1.0.2",
     "uuid": "^8.3.2",
