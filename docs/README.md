@@ -1,13 +1,28 @@
 ---
-title: Website analytics 
+title: Website analytics
 lang: en-US
+home: true
+heroText: Kibanalytics
+tagline: No more Google Analytics. Own your website's traffic data.
+actions:
+  - text: Quick Intro
+    link: /introduction
+    type: primary
+  - text: Setup
+    link: /setup
+    type: secondary
+features:
+  - title: Open Source
+    details: summary of this feature
+  - title: Data Ownership
+    details: summary of this feature
+  - title: AdBlock Avoidance
+    details: Summary of this feature
+  - title: Powerful Aggregations
+    details: Summary of this feature
+  - title: Fine grained filtering
+    details: Summary of this feature
+  - title: Big Data Storage capabilities
+    details: Summary of this feature
+footer: Powered by Virail GmbH
 ---
-
-# Kibanalytics
-
-This project aims to make use of the [ELK stack](https://www.elastic.co/what-is/elk-stack) to collect events from web
-pages and visualize them, offering the same kind of insights
-that [Google Analytics](https://analytics.google.com/analytics/web/) does.
-
-The reason behind this project is to provide an alternative to GA, that offers data ownership, adblocker avoidance,
-powerful aggregations, grained filtering and big data storage.
