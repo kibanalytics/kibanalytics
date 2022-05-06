@@ -113,6 +113,9 @@ Key used for [Redis](https://redis.io) temporary store and Logstash index creati
 
 ## Docker-Compose
 
+[Docker-Compose](https://docs.docker.com/compose/) is a tool that helps to define and share multi-container applications. As Kibanalytics is composed by a
+stack of open source projects, it's easier for a quick start to use containers.
+
 ### Elasticsearch
 
 ### Redis
