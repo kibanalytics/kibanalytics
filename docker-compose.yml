@@ -1,61 +1,84 @@
 version: "3.5"
 
-volumes:
-  data-es:
-    driver: local
-
 services:
   redis:
-    container_name: kibanalytics.redis
     image: redis
-    ports:
-      - "${REDIS_LISTEN:-127.0.0.1:6379:6379}"
-
-  node:
-    container_name: kibanalytics.node
-    image: node:16
     restart: unless-stopped
+    hostname: redis
     volumes:
-      - .:/app
-      - ./node_modules:/app/node_modules
-    working_dir: /app
-    command: node index.js
-    ports:
-      - ${NODE_LISTEN:-127.0.0.1:3000:3000}
-
-  logstash:
-    container_name: kibanalytics.logstash
-    network_mode: host
-    image: docker.elastic.co/logstash/logstash:7.14.1
-    volumes:
-      - ./elk/logstash/pipeline/:/usr/share/logstash/pipeline/
-      - ./elk/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./config/redis/redis.conf:/usr/local/etc/redis/redis.conf
     logging:
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: ${DOCKER_LOG_MAX_SIZE}
+        max-file: ${DOCKER_LOG_MAX_FILE}
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.14.1
+    depends_on:
+      - redis
+    restart: unless-stopped
+    hostname: logstash
+    volumes:
+      - ./config/logstash/pipeline/:/usr/share/logstash/pipeline/
+      - ./config/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
+    env_file:
+      - .env
+    logging:
+      options:
+        max-size: ${DOCKER_LOG_MAX_SIZE}
+        max-file: ${DOCKER_LOG_MAX_FILE}
 
   elasticsearch:
-    container_name: kibanalytics.elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+    depends_on:
+      - logstash
+    restart: unless-stopped
     hostname: elasticsearch
-
     environment:
       - "xpack.security.enabled=false"
       - "discovery.seed_hosts=127.0.0.1:9300"
       - "discovery.type=single-node"
       - "ES_JAVA_OPTS=${ELASTICSEARCH_JAVA_OPTS:--Xms512m -Xmx512m}"
-
     volumes:
-      - data-es:/usr/share/elasticsearch/data:rw
-    ports:
-      - ${ELASTICSEARCH_LISTEN:-9200:9200}
+      - /usr/share/elasticsearch/data
+    logging:
+      options:
+        max-size: ${DOCKER_LOG_MAX_SIZE}
+        max-file: ${DOCKER_LOG_MAX_FILE}
 
   kibana:
-    container_name: kibanalytics.kibana
     image: docker.elastic.co/kibana/kibana:7.14.1
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+    hostname: kibana
     volumes:
-      - ./elk/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - ./config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    env_file:
+      - .env
     ports:
       - "5601:5601"
+    logging:
+      options:
+        max-size: ${DOCKER_LOG_MAX_SIZE}
+        max-file: ${DOCKER_LOG_MAX_FILE}
 
+  node:
+    build: .
+    depends_on:
+      - redis
+    restart: unless-stopped
+    hostname: node
+    volumes:
+      - .:/app
+      - ./app/node_modules
+    working_dir: /app
+    command: node ./index.js
+    env_file:
+      - .env
+    ports:
+      - "${EXPRESS_PORT}:${EXPRESS_PORT}"
+    logging:
+      options:
+        max-size: ${DOCKER_LOG_MAX_SIZE}
+        max-file: ${DOCKER_LOG_MAX_FILE}

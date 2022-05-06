@@ -2,7 +2,12 @@ const { createClient } = require('redis');
 const logger = require('./logger');
 
 const options = {
-    url: process.env.REDIS_URI,
+    socket: {
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT
+    },
+    username: process.env.REDIS_USERNAME,
+    password: process.env.REDIS_PASSWORD,
     legacyMode: true // Required for connect-redis
 }
 const client = createClient(options);
