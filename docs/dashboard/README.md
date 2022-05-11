@@ -15,6 +15,7 @@ Below are the default dashboard metrics, a brief description, how they were calc
 
 ![Image from images folder](~@source/images/dashboard-events-metric.png)
 
+Events dispatched by the tracker client lib.
 The events metric is calculated by couting the total number of calls to the server collect API in a time range.
 
 ```json
@@ -286,36 +287,239 @@ The new users metric is calculated by counting the total number of unique user _
 
 ![Image from images folder](~@source/images/dashboard-overview-bar-chart.png)
 
-The overview area chart have values calculated by the same metrics mentioned before (events, pageviews, sessions, users and new users) in a time range
+The overview area chart have values calculated by the same metrics mentioned before (events, pageviews, sessions, users and new users) in a time range.
 
 ## Pageviews / Session Metric
 
 ![Image from images folder](~@source/images/dashboard-pageviews-session-metric.png)
 
+Pageviews / Session metric is the relation between pageviews and sessions in a time range.
+
+This metric uses Kibana TSVB visualization so query inspection is not supported. Check que visualization for the
+implementation.
+
 ## Sessions / User Metric
 
 ![Image from images folder](~@source/images/dashboard-sessions-user-metric.png)
+
+Sessions / User metric is the relation between sessions and users in a time range.
+
+This metric uses Kibana TSVB visualization so query inspection is not supported. Check que visualization for the
+implementation.
 
 ## Bounce Rate Metric
 
 ![Image from images folder](~@source/images/dashboard-bounce-rate-metric.png)
 
+Bounce rate is the number of sessions with only a single pageview event in a time range.
+
+This metric uses Kibana TSVB visualization so query inspection is not supported. Check que visualization for the
+implementation.
+
 ## Returning Users Metric
 
 ![Image from images folder](~@source/images/dashboard-returning-users-metric.png)
+
+Number of returning users in a time range. It's considered a returning user the total of unique user _ids from
+not new sessions.
+
+This metric uses Kibana TSVB visualization so query inspection is not supported. Check que visualization for the
+implementation.
 
 ## Devices Pie Chart
 
 ![Image from images folder](~@source/images/dashboard-devices-pie-chart.png)
 
+Chart with the count of devices from unique users by type in a time range. Limited by the top 5 devices.
+
+```json
+{
+  "aggs": {
+    "2": {
+      "terms": {
+        "field": "device.type.keyword",
+        "order": {
+          "1": "desc"
+        },
+        "size": 5
+      },
+      "aggs": {
+        "1": {
+          "cardinality": {
+            "field": "user._id.keyword"
+          }
+        }
+      }
+    }
+  },
+  "size": 0,
+  "fields": [
+    {
+      "field": "@timestamp",
+      "format": "date_time"
+    }
+  ],
+  "script_fields": {},
+  "stored_fields": [
+    "*"
+  ],
+  "_source": {
+    "excludes": []
+  },
+  "query": {
+    "bool": {
+      "must": [],
+      "filter": [
+        {
+          "match_all": {}
+        },
+        {
+          "range": {
+            "@timestamp": {
+              "gte": "2022-05-11T00:22:27.786Z",
+              "lte": "2022-05-11T00:37:27.786Z",
+              "format": "strict_date_optional_time"
+            }
+          }
+        }
+      ],
+      "should": [],
+      "must_not": []
+    }
+  }
+}
+```
+
 ## Browsers Pie Chart
 
 ![Image from images folder](~@source/images/dashboard-browsers-pie-chart.png)
+
+Chart with the count of browsers from unique users by name in a time range. Limited by the top 5 browsers.
+
+```json
+{
+  "aggs": {
+    "2": {
+      "terms": {
+        "field": "browser.name.keyword",
+        "order": {
+          "1": "desc"
+        },
+        "size": 5
+      },
+      "aggs": {
+        "1": {
+          "cardinality": {
+            "field": "user._id.keyword"
+          }
+        }
+      }
+    }
+  },
+  "size": 0,
+  "fields": [
+    {
+      "field": "@timestamp",
+      "format": "date_time"
+    }
+  ],
+  "script_fields": {},
+  "stored_fields": [
+    "*"
+  ],
+  "_source": {
+    "excludes": []
+  },
+  "query": {
+    "bool": {
+      "must": [],
+      "filter": [
+        {
+          "match_all": {}
+        },
+        {
+          "range": {
+            "@timestamp": {
+              "gte": "2022-05-11T00:25:37.682Z",
+              "lte": "2022-05-11T00:40:37.682Z",
+              "format": "strict_date_optional_time"
+            }
+          }
+        }
+      ],
+      "should": [],
+      "must_not": []
+    }
+  }
+}
+```
 
 ## Countries Table
 
 ![Image from images folder](~@source/images/dashboard-countries-table.png)
 
+Chart with the count of unique users by country in a time range. Limited by the top 19 countries.
+
+```json
+{
+  "aggs": {
+    "2": {
+      "terms": {
+        "field": "ip.country.keyword",
+        "order": {
+          "1": "desc"
+        },
+        "size": 19
+      },
+      "aggs": {
+        "1": {
+          "cardinality": {
+            "field": "user._id.keyword"
+          }
+        }
+      }
+    }
+  },
+  "size": 0,
+  "fields": [
+    {
+      "field": "@timestamp",
+      "format": "date_time"
+    }
+  ],
+  "script_fields": {},
+  "stored_fields": [
+    "*"
+  ],
+  "_source": {
+    "excludes": []
+  },
+  "query": {
+    "bool": {
+      "must": [],
+      "filter": [
+        {
+          "match_all": {}
+        },
+        {
+          "range": {
+            "@timestamp": {
+              "gte": "2022-05-11T00:27:38.924Z",
+              "lte": "2022-05-11T00:42:38.924Z",
+              "format": "strict_date_optional_time"
+            }
+          }
+        }
+      ],
+      "should": [],
+      "must_not": []
+    }
+  }
+}
+```
+
 ## Overview Map
 
 ![Image from images folder](~@source/images/dashboard-overview-map.png)
+
+The overview map have values calculated by the same metrics mentioned before (events, pageviews, sessions and users) in a time range.
