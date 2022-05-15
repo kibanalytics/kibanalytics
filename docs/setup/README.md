@@ -28,12 +28,15 @@ If you just want start straightaway, just rename .env.example to .env and use al
 | REDIS_PORT                         |  int   |              Valid host port number |
 | ELASTICSEARCH_URI                  | string |             Valid Elasticsearch URI |
 | TRACKING_KEY                       | string |                        Valid string |
+| KIBANA_LOAD_DEFAULT_DASHBOARDS     |  int   |                                0, 1 |
 | DOCKER_LOG_MAX_SIZE                | string | Number >= 1 suffixed with magnitude |
 | DOCKER_LOG_MAX_FILE                |  int   |                         Number >= 1 |
 
 ### NODE_ENV
 
 Flag which indicates whether the server is running on development or production mode.
+
+If you're running Node.js outside of docker enviroment, set the value of NODE_ENV to "development".
 
 ### NODE_CLUSTER
 
@@ -112,6 +115,8 @@ Redis server host.
 To point to the local Redis server started with Docker Compose, 
 use the value "redis" as it is an alias to the internal Docker network Redis host.
 
+If NODE_ENV is set to "development", Node.js server will override REDIS_HOST value to "localhost".
+
 ### REDIS_PORT
 
 Redis server host port.
@@ -123,9 +128,15 @@ Redis server host port.
 To point to the local Elasticsearch server started with Docker Compose,
 use the value "http://elasticsearch:9200" as it is an alias to the internal Docker network Elasticsearch host.
 
+If NODE_ENV is set to "development", Node.js server will override ELASTICSEARCH_URI value to "http://localhost:9200".
+
 ### TRACKING_KEY
 
 Key used for [Redis](https://redis.io) temporary store and Logstash index creation prefix.
+
+### KIBANA_LOAD_DEFAULT_DASHBOARDS
+
+Load default Kibana index pattern and dashboards.
 
 ### DOCKER_LOG_MAX_SIZE
 
@@ -150,7 +161,7 @@ After completing all the setup steps from Docker and Docker-Compose, to start Ki
 the provided .env file with default configuration values, just run:
 
 ```bash
-docker-compose up
+docker-compose up --build
 ```
 
 After all containers started, you can open Kibana to check events and metrics 

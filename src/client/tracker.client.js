@@ -45,7 +45,7 @@ import {
         if (doNotTrack()) return;
         const eventTs = (new Date()).getTime();
 
-        const url = `${serverUrl}`;
+        const url = serverUrl;
         const body = {
             url: {
                 href: currentUrl

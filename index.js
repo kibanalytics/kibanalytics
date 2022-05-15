@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const os = require('os');
 const cluster = require('cluster');
+const { Worker } = require('worker_threads');
 const logger = require('./src/logger');
 const redisClient = require('./src/redis-client');
 const express = require('express');
@@ -114,4 +115,10 @@ if (clusterWorkerSize > 1) {
     }
 } else {
     init();
+}
+
+if (!!+process.env.KIBANA_LOAD_DEFAULT_DASHBOARDS) {
+    const loadDashboardsWorker = new Worker('./src/dashboards/load.dashboards.js');
+    loadDashboardsWorker.on('error', (err) => logger.error(err?.stack));
+    loadDashboardsWorker.on('exit', (code) => logger.info(`Load Dashboards Worker has stopped with code ${code}`));
 }
