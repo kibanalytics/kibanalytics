@@ -1,0 +1,16 @@
+{
+  "mappings": {
+    "properties": {
+      "ip": {
+        "dynamic": true,
+        "type": "object",
+        "enabled": true,
+        "properties": {
+          "ll": {
+            "type": "geo_point"
+          }
+        }
+      }
+    }
+  }
+}

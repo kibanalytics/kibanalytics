@@ -3,7 +3,7 @@ const logger = require('./logger');
 
 const options = {
     socket: {
-        host: process.env.REDIS_HOST,
+        host: process.env.NODE_ENV === 'development' ? 'localhost' : process.env.REDIS_HOST,
         port: process.env.REDIS_PORT
     },
     username: process.env.REDIS_USERNAME,

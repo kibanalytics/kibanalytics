@@ -241,7 +241,7 @@ __webpack_require__.r(__webpack_exports__);
         if ((0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.doNotTrack)()) return;
         const eventTs = (new Date()).getTime();
 
-        const url = `${serverUrl}`;
+        const url = serverUrl;
         const body = {
             url: {
                 href: currentUrl

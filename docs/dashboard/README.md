@@ -4,7 +4,14 @@ Kibanalytics has a default dashboard for viewing the collected data.
 
 ![Image from images folder](~@source/images/dashboard.png)
 
-It can be fully customized within the [Kibana](https://www.elastic.co/pt/kibana/) interface and also serves as a template for new dashboards. There are many
+To load the default dashboard at first start, remember to set KIBANA_LOAD_DEFAULT_DASHBOARDS enviroment variable to "1".
+
+::: warning
+Kibana index needs at last one entry in database to dynamic load properties, so before the open the dashboard, ensure to have
+at last one dispatched event from Kibanalytis, otherwise the dashboard will show multiple errors.
+:::
+
+The dashboard can be fully customized within the [Kibana](https://www.elastic.co/pt/kibana/) interface and also serves as a template for new dashboards. There are many
 ways to aggregate data, and each project has specific needs and metrics, feel free to modify it and add your own metrics.
 
 To learn more about Kibana tool and how to use it to customize the dashboard, it is recommended to read the oficial [Kibana guide](https://www.elastic.co/guide/en/kibana/current/index.html).
