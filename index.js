@@ -40,9 +40,6 @@ const init = async () => {
             ],
             tracesSampleRate: 1.0,
         });
-
-        app.use(Sentry.Handlers.requestHandler());
-        app.use(Sentry.Handlers.tracingHandler());
     }
 
     if (!!+process.env.EXPRESS_GZIP) {
