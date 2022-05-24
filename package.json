@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@sentry/node": "^6.19.3",
-    "@sentry/tracing": "^6.19.3",
     "ajv": "^8.11.0",
     "ajv-keywords": "^5.1.0",
     "body-parser": "^1.19.2",

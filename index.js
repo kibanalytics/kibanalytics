@@ -10,7 +10,6 @@ const compression = require('compression');
 const bodyParser = require('body-parser');
 const expressWinston = require('express-winston');
 const Sentry = require('@sentry/node');
-const Tracing = require('@sentry/tracing');
 const helmet = require('helmet');
 const cors = require('cors');
 const corsOptions = require('./src/cors-options');
