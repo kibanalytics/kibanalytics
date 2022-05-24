@@ -227,6 +227,7 @@ __webpack_require__.r(__webpack_exports__);
     const listeners = new Map();
 
     let serverUrl = attr('data-server-url') || `${location.origin}/collect`; // default value
+    let autoTrack = attr('data-auto-track') !== 'false';
     let serverSideData = {};
     let eventClassPrefix = 'kbs'; // default value
     let eventClassRegex = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.getClassPrefixRegExp)(eventClassPrefix);
@@ -454,7 +455,7 @@ __webpack_require__.r(__webpack_exports__);
 
     /* Start */
 
-    if (!(0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.doNotTrack)()) {
+    if (autoTrack && !(0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.doNotTrack)()) {
         history.pushState = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.hook)(history, 'pushState', handlePush);
         history.replaceState = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.hook)(history, 'replaceState', handlePush);
 

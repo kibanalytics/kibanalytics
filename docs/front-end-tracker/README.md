@@ -17,9 +17,10 @@
 
 Those are the possible properties to the script tag:
 
-| Name            |  Type  |                                                                 Description |
-|:----------------|:------:|----------------------------------------------------------------------------:|
-| data-server-url | string | Sets the URL of Kibanalytics server endpoint. <br/> Defaults to '/collect'. |
+| Name            |  Type   |                                                                 Description |
+|:----------------|:-------:|----------------------------------------------------------------------------:|
+| data-server-url | string  | Sets the URL of Kibanalytics server endpoint. <br/> Defaults to '/collect'. |
+| data-auto-track | boolean |          Enable or disable page view events auto track. Enabled by default. |
 
 Another way to set the server url is by setting the value of 'serverSideData' property of the kbs global object.
 
@@ -31,7 +32,6 @@ kbs.serverUrl = 'https://mywebsite.com/collect';
 
 By default, Kibanalytics will track page view events. A new page view event is dispatched every time the state property
 from the [history](https://developer.mozilla.org/en-US/docs/Web/API/History) web API changes.
-
 
 Simply put, this happens every time the user navigates to a new URL.
 
