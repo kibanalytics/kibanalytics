@@ -31,18 +31,17 @@ Another way to set the server url is by setting the value of 'serverSideData' pr
 kbs.serverUrl = 'https://mywebsite.com/collect';
 ```
 
-## Page View Event
+## Event Tracking
 
 By default, Kibanalytics will track page view events. A new page view event is dispatched every time the state property
 from the [history](https://developer.mozilla.org/en-US/docs/Web/API/History) web API changes.
+Simply put, this happens every time the user navigates to a new URL. 
 
-Simply put, this happens every time the user navigates to a new URL.
+It's possible to change this behaivor by setting the 'data-auto-track' kbs script html
+attribute value to 'false'.
 
-## Track Events
-
-Track a [event](https://developer.mozilla.org/en-US/docs/Web/Events) from a DOM [element](https://developer.mozilla.org/en-US/docs/Web/API/Element) object.
-
-There are two ways to track events in Kibanalytics, using JavaScript or CSS classes.
+Also, it's possible to track a [event](https://developer.mozilla.org/en-US/docs/Web/Events) from a DOM [element](https://developer.mozilla.org/en-US/docs/Web/API/Element) object.
+There are two ways to track DOM element events in Kibanalytics: using JavaScript or CSS classes.
 
 ### JavaScript Event Tracking
 
