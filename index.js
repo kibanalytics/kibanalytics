@@ -35,11 +35,14 @@ const init = async () => {
         Sentry.init({
             dsn: process.env.SENTRY_DSN,
             integrations: [
-                new Sentry.Integrations.Http({ tracing: true }),
+                new Sentry.Integrations.Http({ tracing: false }),
                 new Tracing.Integrations.Express({ app }),
             ],
             tracesSampleRate: 1.0,
         });
+
+        app.use(Sentry.Handlers.requestHandler());
+        app.use(Sentry.Handlers.tracingHandler());
     }
 
     if (!!+process.env.EXPRESS_GZIP) {
