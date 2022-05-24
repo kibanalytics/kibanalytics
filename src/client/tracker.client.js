@@ -31,6 +31,7 @@ import {
     const listeners = new Map();
 
     let serverUrl = attr('data-server-url') || `${location.origin}/collect`; // default value
+    let autoTrack = attr('data-auto-track') !== 'false';
     let serverSideData = {};
     let eventClassPrefix = 'kbs'; // default value
     let eventClassRegex = getClassPrefixRegExp(eventClassPrefix);
@@ -258,7 +259,7 @@ import {
 
     /* Start */
 
-    if (!doNotTrack()) {
+    if (autoTrack && !doNotTrack()) {
         history.pushState = hook(history, 'pushState', handlePush);
         history.replaceState = hook(history, 'replaceState', handlePush);
 
