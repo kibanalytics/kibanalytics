@@ -1,5 +1,7 @@
 # Front-End Tracker Library
 
+To start tracking events, it's mandatory to load the front-end KBS tracker library.
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -15,12 +17,13 @@
 </html>
 ```
 
-Those are the possible properties to the script tag:
+Those are the possible configuration properties to the script tag:
 
 | Name            |  Type   |                                                                 Description |
 |:----------------|:-------:|----------------------------------------------------------------------------:|
 | data-server-url | string  | Sets the URL of Kibanalytics server endpoint. <br/> Defaults to '/collect'. |
-| data-auto-track | boolean |          Enable or disable page view events auto track. Enabled by default. |
+| data-auto-track | boolean |    Enable or disable page view events auto track. <br/> Enabled by default. |
+| data-css-prefix | string  |         CSS prefix for class based event tracking. <br/> Defaults to 'kbs'. |
 
 Another way to set the server url is by setting the value of 'serverSideData' property of the kbs global object.
 
@@ -35,9 +38,13 @@ from the [history](https://developer.mozilla.org/en-US/docs/Web/API/History) web
 
 Simply put, this happens every time the user navigates to a new URL.
 
-## Track Event
+## Track Events
 
 Track a [event](https://developer.mozilla.org/en-US/docs/Web/Events) from a DOM [element](https://developer.mozilla.org/en-US/docs/Web/API/Element) object.
+
+There are two ways to track events in Kibanalytics, using JavaScript or CSS classes.
+
+### JavaScript Event Tracking
 
 ```html
 <button id="myButton">Click Here</button>
@@ -69,9 +76,9 @@ const label = 'myButtonClick';
 kbs.trackEvent(selector, type, data, label);
 ```
 
-## Track Event List
+### JavaScript Event List Tracking
 
-Track events from a array. Useful to add multiple events at once.
+Track events from an array. Useful to add multiple events at once.
 
 ```html
 <button id="button01">Button 01</button>
@@ -120,7 +127,7 @@ kbs.trackEventListUrl(eventListUrl)
     .then(() => console.log('eventListUrl loaded.'));
 ```
 
-## Custom Events
+### Custom JavaScript Events
 
 To programmatically dispatch a custom event, use the 'track' function from kbs global object.
 
@@ -142,6 +149,42 @@ kbs.track(type, data).then(response => {
         'success', 'dcfe7e64-49f9-477a-b4da-3f82ebb8e3a5'
      */
 });
+```
+
+### CSS Class Event Tracking
+
+It's possible to track events by simply adding a special prefixed CSS class to the element you want to track and
+the dispatched event by the element.
+
+The CSS class sintax uses the follow pattern: {{prefix}}-{{event}}-{{custom-id}}.
+
+```html
+<button class="kbs-click-button01">Button 01</button>
+```
+
+By default, the CSS class prefix is defined to 'kbs', but it could be changed by the 'data-css-prefix' kbs script html 
+attribute value:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Website</title>
+    <script src="kbs.js" data-css-prefix="myCustomPrefix"></script>
+    ...
+</head>
+<body>
+<button class="myCustomPrefix-click-button01">Button 01</button>
+...
+</body>
+</html>
+```
+
+Also, it's possible to change the CSS class prefix with JavaScript:
+
+```javascript
+kbs.eventClassPrefix = 'myCustomPrefix';
 ```
 
 ## Server-Side Custom Data

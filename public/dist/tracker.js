@@ -228,8 +228,8 @@ __webpack_require__.r(__webpack_exports__);
 
     let serverUrl = attr('data-server-url') || `${location.origin}/collect`; // default value
     let autoTrack = attr('data-auto-track') !== 'false';
+    let eventClassPrefix = attr('data-css-prefix') || 'kbs'; // default value
     let serverSideData = {};
-    let eventClassPrefix = 'kbs'; // default value
     let eventClassRegex = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.getClassPrefixRegExp)(eventClassPrefix);
     let eventClassSelector = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.getEventClassSelector)(eventClassPrefix);
     let callback = null;
@@ -455,13 +455,13 @@ __webpack_require__.r(__webpack_exports__);
 
     /* Start */
 
-    if (autoTrack && !(0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.doNotTrack)()) {
+    if (!(0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.doNotTrack)()) {
         history.pushState = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.hook)(history, 'pushState', handlePush);
         history.replaceState = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.hook)(history, 'replaceState', handlePush);
 
         const update = () => {
             if (document.readyState === 'complete') {
-                track('pageview');
+                if (autoTrack) track('pageview');
                 addClassEvents(document);
                 observeDocument();
             }

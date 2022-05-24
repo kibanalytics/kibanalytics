@@ -32,8 +32,8 @@ import {
 
     let serverUrl = attr('data-server-url') || `${location.origin}/collect`; // default value
     let autoTrack = attr('data-auto-track') !== 'false';
+    let eventClassPrefix = attr('data-css-prefix') || 'kbs'; // default value
     let serverSideData = {};
-    let eventClassPrefix = 'kbs'; // default value
     let eventClassRegex = getClassPrefixRegExp(eventClassPrefix);
     let eventClassSelector = getEventClassSelector(eventClassPrefix);
     let callback = null;
@@ -259,13 +259,13 @@ import {
 
     /* Start */
 
-    if (autoTrack && !doNotTrack()) {
+    if (!doNotTrack()) {
         history.pushState = hook(history, 'pushState', handlePush);
         history.replaceState = hook(history, 'replaceState', handlePush);
 
         const update = () => {
             if (document.readyState === 'complete') {
-                track('pageview');
+                if (autoTrack) track('pageview');
                 addClassEvents(document);
                 observeDocument();
             }
