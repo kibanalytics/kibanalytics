@@ -33,16 +33,9 @@ const init = async () => {
 
     if (process.env.SENTRY_DSN) {
         Sentry.init({
-            dsn: process.env.SENTRY_DSN,
-            integrations: [
-                new Sentry.Integrations.Http({ tracing: false }),
-                new Tracing.Integrations.Express({ app }),
-            ],
-            tracesSampleRate: 1.0,
+            dsn: process.env.SENTRY_DSN
         });
-
         app.use(Sentry.Handlers.requestHandler());
-        app.use(Sentry.Handlers.tracingHandler());
     }
 
     if (!!+process.env.EXPRESS_GZIP) {
@@ -92,7 +85,10 @@ const init = async () => {
     app.post('/', controller.collect);
     app.post(`/${process.env.COLLECT_ENDPOINT ?? 'collect'}`, controller.collect);
 
-    app.use(Sentry.Handlers.errorHandler());
+    if (process.env.SENTRY_DSN) {
+        app.use(Sentry.Handlers.errorHandler());
+    }
+
     app.use(errorHandler);
     app.listen(process.env.EXPRESS_PORT, () => {
         logger.info(`Express app listening on port ${process.env.EXPRESS_PORT}`);
