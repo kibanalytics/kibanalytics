@@ -67,8 +67,6 @@ services:
   kibana:
     image: docker.elastic.co/kibana/kibana:7.14.1
     container_name: kibanalytics.kibana
-    depends_on:
-      - elasticsearch
     restart: unless-stopped
     hostname: kibana
     volumes:
