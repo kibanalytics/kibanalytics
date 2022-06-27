@@ -19,12 +19,10 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
-    ports:
-      - "6379:6379"
     logging:
       options:
-        max-size: ${DOCKER_LOG_MAX_SIZE}
-        max-file: ${DOCKER_LOG_MAX_FILE}
+        max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
+        max-file: ${DOCKER_LOG_MAX_FILE:-10m}
 
   logstash:
     image: docker.elastic.co/logstash/logstash:7.14.1
@@ -40,8 +38,8 @@ services:
       - .env
     logging:
       options:
-        max-size: ${DOCKER_LOG_MAX_SIZE}
-        max-file: ${DOCKER_LOG_MAX_FILE}
+        max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
+        max-file: ${DOCKER_LOG_MAX_FILE:-10m}
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
@@ -61,8 +59,8 @@ services:
       - "9200:9200"
     logging:
       options:
-        max-size: ${DOCKER_LOG_MAX_SIZE}
-        max-file: ${DOCKER_LOG_MAX_FILE}
+        max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
+        max-file: ${DOCKER_LOG_MAX_FILE:-10m}
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.14.1
@@ -77,8 +75,8 @@ services:
       - "5601:5601"
     logging:
       options:
-        max-size: ${DOCKER_LOG_MAX_SIZE}
-        max-file: ${DOCKER_LOG_MAX_FILE}
+        max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
+        max-file: ${DOCKER_LOG_MAX_FILE:-10m}
 
   node:
     container_name: kibanalytics.node
@@ -96,8 +94,8 @@ services:
       - .env
     logging:
       options:
-        max-size: ${DOCKER_LOG_MAX_SIZE}
-        max-file: ${DOCKER_LOG_MAX_FILE}
+        max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
+        max-file: ${DOCKER_LOG_MAX_FILE:-10m}
 
   varnish:
     profiles: [ "varnish" ]
