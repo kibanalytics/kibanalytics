@@ -37,6 +37,10 @@ const init = async () => {
         app.use(Sentry.Handlers.requestHandler());
     }
 
+    if (!!+process.env.EXPRESS_VARNISH_HEADERS) {
+        app.use(varnishHeaders);
+    }
+
     if (!!+process.env.EXPRESS_GZIP) {
         /*
             For use on servers without reverse-proxy
@@ -87,8 +91,8 @@ const init = async () => {
     if (process.env.SENTRY_DSN) {
         app.use(Sentry.Handlers.errorHandler());
     }
-
     app.use(errorHandler);
+
     app.listen(process.env.EXPRESS_PORT, () => {
         logger.info(`Express app listening on port ${process.env.EXPRESS_PORT}`);
     });
