@@ -1,4 +1,4 @@
-version: "3.5"
+version: "3.9"
 
 services:
   redis:
@@ -7,6 +7,11 @@ services:
     hostname: redis
     volumes:
       - ./config/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     ports:
       - "6379:6379"
     logging:
@@ -86,6 +91,36 @@ services:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE}
         max-file: ${DOCKER_LOG_MAX_FILE}
+
+  varnish:
+    profiles: [ "varnish" ]
+    container_name: varnish
+    hostname: varnish
+    image: darioguarascio/varnish-elk-docker:latest
+    restart: unless-stopped
+    depends_on:
+      node:
+        condition: service_started
+    volumes:
+      - /vcache
+      - ./config/varnish/varnish_backends.vcl:/usr/share/varnish/vcl/varnish_backends.vcl
+    ports:
+      - ${VARNISH_LISTEN:-80}:80
+    environment:
+      ENV: ${VARNISH_ENV:-dev}
+      VARNISHD_MEMORY: ${VARNISH_MEMORY:-malloc,32m}
+      VARNISH_PURGE_KEY: ${VARNISH_PURGE_KEY:-dev}
+    healthcheck:
+      test: [ "CMD", "sh", "-c", "test -e /proc/`cat /varnish.pid` || (kill -s 15 -1 && (sleep 10; kill -s 9 -1))" ]
+      interval: 5s
+      timeout: 1s
+      retries: 1
+      start_period: 5s
+    logging:
+      driver: syslog
+      options:
+        cache-disabled: "false"
+        syslog-address: udp://${VARNISH_LOGGER_IP:-127.0.0.1}:${VARNISH_LOGGER_PORT:-5445}
 
 volumes:
   elasticsearch:

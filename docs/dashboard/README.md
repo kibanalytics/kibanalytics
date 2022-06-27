@@ -7,7 +7,7 @@ Kibanalytics has a default dashboard for viewing the collected data.
 To load the default dashboard at first start, remember to set KIBANA_LOAD_DEFAULT_DASHBOARDS enviroment variable to "1".
 
 ::: warning
-Kibana index needs at last one entry in database to dynamic load properties, so before the open the dashboard, ensure to have
+Kibana index needs at last one entry in database to dynamic load properties, so before open the dashboard, ensure to have
 at last one dispatched event from Kibanalytis, otherwise the dashboard will show multiple errors.
 :::
 
