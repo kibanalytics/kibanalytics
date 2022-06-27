@@ -1,8 +1,15 @@
 version: "3.9"
 
+volumes:
+  elasticsearch:
+    driver: local
+  node_modules:
+    driver: local
+
 services:
   redis:
     image: redis
+    container_name: kibanalytics.redis
     restart: unless-stopped
     hostname: redis
     volumes:
@@ -21,6 +28,7 @@ services:
 
   logstash:
     image: docker.elastic.co/logstash/logstash:7.14.1
+    container_name: kibanalytics.logtstash
     depends_on:
       - redis
     restart: unless-stopped
@@ -37,6 +45,7 @@ services:
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+    container_name: kibanalytics.elasticsearch
     depends_on:
       - logstash
     restart: unless-stopped
@@ -57,6 +66,7 @@ services:
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.14.1
+    container_name: kibanalytics.kibana
     depends_on:
       - elasticsearch
     restart: unless-stopped
@@ -73,6 +83,7 @@ services:
         max-file: ${DOCKER_LOG_MAX_FILE}
 
   node:
+    container_name: kibanalytics.node
     build: .
     depends_on:
       - redis
@@ -94,7 +105,7 @@ services:
 
   varnish:
     profiles: [ "varnish" ]
-    container_name: varnish
+    container_name: kibanalytics.varnish
     hostname: varnish
     image: darioguarascio/varnish-elk-docker:latest
     restart: unless-stopped
@@ -122,6 +133,3 @@ services:
         cache-disabled: "false"
         syslog-address: udp://${VARNISH_LOGGER_IP:-127.0.0.1}:${VARNISH_LOGGER_PORT:-5445}
 
-volumes:
-  elasticsearch:
-  node_modules:
