@@ -14,6 +14,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const corsOptions = require('./src/cors-options');
 const session = require('./src/session');
+const varnishHeaders = require('./src/varnish-headers');
 const controller = require('./src/controller');
 const errorHandler = require('./src/error-handler');
 
