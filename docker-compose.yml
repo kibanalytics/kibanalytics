@@ -22,7 +22,7 @@ services:
     logging:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
-        max-file: ${DOCKER_LOG_MAX_FILE:-10m}
+        max-file: ${DOCKER_LOG_MAX_FILE:-5}
 
   logstash:
     image: docker.elastic.co/logstash/logstash:7.14.1
@@ -39,7 +39,7 @@ services:
     logging:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
-        max-file: ${DOCKER_LOG_MAX_FILE:-10m}
+        max-file: ${DOCKER_LOG_MAX_FILE:-5}
 
   elasticsearch:
     network_mode: host
@@ -61,7 +61,7 @@ services:
     logging:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
-        max-file: ${DOCKER_LOG_MAX_FILE:-10m}
+        max-file: ${DOCKER_LOG_MAX_FILE:-5}
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.14.1
@@ -77,7 +77,7 @@ services:
     logging:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
-        max-file: ${DOCKER_LOG_MAX_FILE:-10m}
+        max-file: ${DOCKER_LOG_MAX_FILE:-5}
 
   node:
     container_name: kibanalytics.node
@@ -96,7 +96,7 @@ services:
     logging:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
-        max-file: ${DOCKER_LOG_MAX_FILE:-10m}
+        max-file: ${DOCKER_LOG_MAX_FILE:-5}
 
   varnish:
     profiles: [ "varnish" ]
