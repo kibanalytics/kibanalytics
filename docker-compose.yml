@@ -57,6 +57,7 @@ services:
       - elasticsearch:/usr/share/elasticsearch/data
     ports:
       - "${ELASTICSEARCH_LISTEN:-9200}:9200"
+      - "${ELASTICSEARCH_NODE_LISTEN:-9300}:9200"
     logging:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
