@@ -42,7 +42,6 @@ services:
         max-file: ${DOCKER_LOG_MAX_FILE:-5}
 
   elasticsearch:
-    network_mode: host
     image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
     container_name: kibanalytics.elasticsearch
     restart: unless-stopped
@@ -51,7 +50,6 @@ services:
       - "node.name=${NODE_NAME:-es}"
       - "cluster.name=${CLUSTER_NAME:-kibanalytics}"
       - "discovery.seed_hosts=${SEED_HOSTS:-127.0.0.1:9300}"
-      - "bootstrap.memory_lock=true"
       - "xpack.security.enabled=false"
       - "ES_JAVA_OPTS=${ELASTICSEARCH_JAVA_OPTS:--Xms512m -Xmx512m}"
     volumes:
