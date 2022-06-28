@@ -49,9 +49,11 @@ services:
     restart: unless-stopped
     hostname: elasticsearch
     environment:
+      - "node.name=${NODE_NAME:-es}"
+      - "cluster.name=${CLUSTER_NAME:-kibanalytics}"
+      - "discovery.seed_hosts=${SEED_HOSTS:-127.0.0.1:9300}"
+      - "bootstrap.memory_lock=true"
       - "xpack.security.enabled=false"
-      - "discovery.seed_hosts=127.0.0.1:9300"
-      - "discovery.type=single-node"
       - "ES_JAVA_OPTS=${ELASTICSEARCH_JAVA_OPTS:--Xms512m -Xmx512m}"
     volumes:
       - elasticsearch:/usr/share/elasticsearch/data
