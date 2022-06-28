@@ -49,7 +49,10 @@ services:
     environment:
       - "node.name=${NODE_NAME:-es}"
       - "network.publish_host=${NODE_PUBLISH_HOST}"
-      - "network.publish_port=${NODE_PUBLISH_PORT}"
+      - "transport.port=${NODE_PUBLISH_PORT}"
+      #- "network.publish_port=${NODE_PUBLISH_PORT}"
+      ## depending on ES version
+
       - "cluster.name=${CLUSTER_NAME:-kibanalytics}"
       - "cluster.initial_master_nodes=${INITIAL_MASTER_NODES:-es}"
       - "discovery.seed_hosts=${SEED_HOSTS:-127.0.0.1:9300}"
