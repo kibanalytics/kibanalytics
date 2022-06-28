@@ -48,6 +48,7 @@ services:
     hostname: elasticsearch
     environment:
       - "node.name=${NODE_NAME:-es}"
+      - "network.publish_host=${NODE_PUBLISH_HOST}"
       - "cluster.name=${CLUSTER_NAME:-kibanalytics}"
       - "cluster.initial_master_nodes=${INITIAL_MASTER_NODES:-es}"
       - "discovery.seed_hosts=${SEED_HOSTS:-127.0.0.1:9300}"
