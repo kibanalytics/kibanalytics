@@ -118,6 +118,7 @@ services:
       ENV: ${VARNISH_ENV:-dev}
       VARNISHD_MEMORY: ${VARNISH_MEMORY:-malloc,32m}
       VARNISH_PURGE_KEY: ${VARNISH_PURGE_KEY:-dev}
+      VARNISH_PROJECT_CODE: ${VARNISH_PROJECT_CODE}
     healthcheck:
       test: [ "CMD", "sh", "-c", "test -e /proc/`cat /varnish.pid` || (kill -s 15 -1 && (sleep 10; kill -s 9 -1))" ]
       interval: 5s
