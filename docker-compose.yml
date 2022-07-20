@@ -131,5 +131,7 @@ services:
       driver: syslog
       options:
         cache-disabled: "false"
+        cache-max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
+        cache-max-file: ${DOCKER_LOG_MAX_FILE:-3}
         syslog-address: udp://${VARNISH_LOGGER_IP:-127.0.0.1}:${VARNISH_LOGGER_PORT:-5445}
 
