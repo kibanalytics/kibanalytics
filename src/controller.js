@@ -1,6 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
 const redisClient = require('./redis-client');
-const isbot = require('isbot');
 const validator = require('./validator');
 const validateCollectEndpoint = validator.getSchema('collectEndpoint');
 const plugins = require('./plugins');
@@ -12,12 +11,6 @@ const EVENT_FLOW_WITH_PAYLOAD = true; // @TODO make this configurable
 const SESSION_DURATION = 30 * 60000; // 30 minutes @TODO make this configurable
 
 module.exports.collect = async (req, res, next) => {
-    // Skip "good bot" requests
-    if (isbot(req.get('user-agent'))) {
-        res.json({ status: 'success' });
-        return;
-    }
-
     try {
         const { body } = req;
 
@@ -159,7 +152,7 @@ module.exports.collect = async (req, res, next) => {
         for (const plugin of plugins) plugin(req);
 
         session.lastEvent = data.event;
-        await redisClient.rPush(process.env.TRACKING_KEY, JSON.stringify(data));
+        redisClient.rPush(process.env.TRACKING_KEY, JSON.stringify(data));
 
         res.json({ status: 'success', event_id: data.event._id });
     } catch (err) {
