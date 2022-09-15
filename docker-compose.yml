@@ -92,7 +92,7 @@ services:
       - .:/app
       - node_modules:/app/node_modules/
     ports:
-      - ${EXPRESS_LISTEN:-80}:80
+      - ${EXPRESS_LISTEN:-80}:3000
     working_dir: /app
     command: node ./index.js
     env_file:
