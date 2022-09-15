@@ -13,7 +13,7 @@ services:
     restart: unless-stopped
     hostname: redis
     volumes:
-      - ./config/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - .config/redis/redis.conf:/usr/local/etc/redis/redis.conf
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
       interval: 5s
@@ -22,8 +22,10 @@ services:
     logging:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
-        max-file: ${DOCKER_LOG_MAX_FILE:-10m}
+        max-file: ${DOCKER_LOG_MAX_FILE:-3}
     command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    ports:
+      - "${REDIS_LISTEN:-127.0.0.1:6379}:6379"
 
   logstash:
     image: docker.elastic.co/logstash/logstash:7.14.1
@@ -33,14 +35,14 @@ services:
     restart: unless-stopped
     hostname: logstash
     volumes:
-      - ./config/logstash/pipeline/:/usr/share/logstash/pipeline/
-      - ./config/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - .config/logstash/pipeline/:/usr/share/logstash/pipeline/
+      - .config/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
     env_file:
       - .env
     logging:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
-        max-file: ${DOCKER_LOG_MAX_FILE:-10m}
+        max-file: ${DOCKER_LOG_MAX_FILE:-3}
 
   elasticsearch:
     profiles: [ "development" ]
@@ -62,7 +64,7 @@ services:
     logging:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
-        max-file: ${DOCKER_LOG_MAX_FILE:-10m}
+        max-file: ${DOCKER_LOG_MAX_FILE:-3}
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.14.1
@@ -70,7 +72,7 @@ services:
     restart: unless-stopped
     hostname: kibana
     volumes:
-      - ./config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - .config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     env_file:
       - .env
     ports:
@@ -78,7 +80,7 @@ services:
     logging:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
-        max-file: ${DOCKER_LOG_MAX_FILE:-10m}
+        max-file: ${DOCKER_LOG_MAX_FILE:-3}
 
   node:
     profiles: [ "production" ]
@@ -100,4 +102,4 @@ services:
     logging:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
-        max-file: ${DOCKER_LOG_MAX_FILE:-10m}
+        max-file: ${DOCKER_LOG_MAX_FILE:-3}
