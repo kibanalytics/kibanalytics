@@ -1,14 +1,21 @@
+const util = require('util');
 const { v4: uuidv4 } = require('uuid');
 const redisClient = require('./redis-client');
 const validator = require('./validator');
 const validateCollectEndpoint = validator.getSchema('collectEndpoint');
 const plugins = require('./plugins');
+const os = require('os');
+const path = require('path');
+const fs = require('fs/promises');
 
 /*
     @TODO Maybe is time to create a config.json file as .env file is starting to get to big
  */
 const EVENT_FLOW_WITH_PAYLOAD = true; // @TODO make this configurable
 const SESSION_DURATION = 30 * 60000; // 30 minutes @TODO make this configurable
+const UPGRADE_FILE_NAME = '.UPGRADE';
+
+const redisPing = util.promisify(redisClient.ping);
 
 module.exports.collect = async (req, res, next) => {
     try {
@@ -157,5 +164,39 @@ module.exports.collect = async (req, res, next) => {
         res.json({ status: 'success', event_id: data.event._id });
     } catch (err) {
         next(err);
+    }
+}
+
+exports.health = async (req, res, next) => {
+    try {
+        const hostname = os.hostname();
+
+        const upgradeFilePath = path.join(process.cwd(), UPGRADE_FILE_NAME);
+        const upgradeFileExists = await (async () => {
+            try {
+                await fs.access(upgradeFilePath);
+                return true;
+            } catch {
+                return false;
+            }
+        })();
+
+        const isRedisHealthy = await redisPing()
+            .then(v => v === 'PONG')
+            .catch(() => false);
+
+        if (upgradeFileExists || !isRedisHealthy) {
+            return res.status(410).json({
+                status: 'error', data: {
+                    hostname,
+                    isRedisHealthy,
+                    upgradeFileExists
+                }
+            });
+        }
+
+        return res.json({ status: 'ok', data: { hostname } });
+    } catch (err) {
+        return next(err);
     }
 }

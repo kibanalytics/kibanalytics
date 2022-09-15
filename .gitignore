@@ -65,3 +65,8 @@ docs/.vuepress/
 
 .npm
 .config
+
+config/kibana/kibana.yml
+config/logstash/pipeline/tracker.conf
+config/redis/redis.conf
+config/varnish/varnish_backends.vcl

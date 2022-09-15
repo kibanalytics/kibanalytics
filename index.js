@@ -88,6 +88,7 @@ const init = async () => {
 
     app.post('/', controller.collect);
     app.post(`/${process.env.COLLECT_ENDPOINT ?? 'collect'}`, controller.collect);
+    app.get('/health', controller.health);
 
     if (process.env.SENTRY_DSN) {
         app.use(Sentry.Handlers.errorHandler());
