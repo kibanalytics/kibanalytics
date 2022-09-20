@@ -7,6 +7,22 @@ volumes:
     driver: local
 
 services:
+  # This service is used to shard redis horizontally
+  twemproxy:
+    image: darioguarascio/twemproxy:latest
+    container_name: virail.web.twemproxy
+    command: nutcracker -c /etc/twemproxy.yml
+    restart: always
+    volumes:
+      - .config/twemproxy.yml:/etc/twemproxy.yml
+    ports:
+      - "${TWEMPROXY_LISTEN:-127.0.0.1:6301}:6301"
+    logging:
+     options:
+        max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
+        max-file: ${DOCKER_LOG_MAX_FILE:-3}
+
+  # redis is used as session storage and event queue
   redis:
     image: redis
     container_name: kibanalytics.redis
@@ -27,6 +43,7 @@ services:
     ports:
       - "${REDIS_LISTEN:-127.0.0.1:6379}:6379"
 
+  # logstash is the agent that reads redis events
   logstash:
     image: docker.elastic.co/logstash/logstash:7.14.1
     container_name: kibanalytics.logtstash
