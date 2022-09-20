@@ -1,7 +1,7 @@
 input {
   redis {
-    host => "${REDIS_HOST}"
-    port => "${REDIS_PORT}"
+    host => "${REDIS_LOGSTASH_SERVER_HOST}"
+    port => "${REDIS_LOGSTASH_SERVER_PORT}"
     key => "${TRACKING_KEY}"
     type => "tracker"
     data_type => "list"

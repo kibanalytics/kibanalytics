@@ -4,7 +4,8 @@ const os = require('os');
 const cluster = require('cluster');
 const { Worker } = require('worker_threads');
 const logger = require('./src/logger');
-const redisClient = require('./src/redis-client');
+const redisSessionClient = require('./src/redis-session-client');
+const redisQueueClient = require('./src/redis-queue-client');
 const express = require('express');
 const compression = require('compression');
 const bodyParser = require('body-parser');
@@ -19,7 +20,8 @@ const controller = require('./src/controller');
 const errorHandler = require('./src/error-handler');
 
 const init = async () => {
-    await redisClient.connect();
+    await redisSessionClient.connect();
+    await redisQueueClient.connect();
     const app = express();
 
     app.use(bodyParser.json());

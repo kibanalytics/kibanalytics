@@ -1,6 +1,6 @@
 const util = require('util');
 const { v4: uuidv4 } = require('uuid');
-const redisClient = require('./redis-client');
+const redisClient = require('./redis-queue-client');
 const validator = require('./validator');
 const validateCollectEndpoint = validator.getSchema('collectEndpoint');
 const plugins = require('./plugins');

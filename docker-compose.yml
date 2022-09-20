@@ -9,16 +9,17 @@ volumes:
 services:
   # This service is used to shard redis horizontally
   twemproxy:
+    profiles: [ "production" ]
     image: darioguarascio/twemproxy:latest
-    container_name: virail.web.twemproxy
+    container_name: kibanalytics.twemproxy
     command: nutcracker -c /etc/twemproxy.yml
     restart: always
     volumes:
-      - .config/twemproxy.yml:/etc/twemproxy.yml
+      - .config/twemproxy/twemproxy.yml:/etc/twemproxy.yml
     ports:
       - "${TWEMPROXY_LISTEN:-127.0.0.1:6301}:6301"
     logging:
-     options:
+      options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
         max-file: ${DOCKER_LOG_MAX_FILE:-3}
 
