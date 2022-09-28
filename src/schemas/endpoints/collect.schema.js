@@ -66,15 +66,10 @@ module.exports = {
         serverSide: {
             type: 'object',
             properties: {
-                foo: { type: 'string' },
-                customEventsPayloadDev: {
-                    type: 'object',
-                    required: [],
-                    additionalProperties: true
-                }
+                foo: { type: 'string' }
             },
             required: [],
-            additionalProperties: false
+            additionalProperties: true
         }
     },
     required: [
