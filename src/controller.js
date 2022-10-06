@@ -161,7 +161,20 @@ module.exports.collect = async (req, res, next) => {
         session.lastEvent = data.event;
         redisClient.rPush(process.env.TRACKING_KEY, JSON.stringify(data));
 
-        res.json({ status: 'success', event_id: data.event._id });
+        res.json({
+            status: 'success',
+            session: {
+                _id: data.session._id
+            },
+            user: {
+                _id: data.user._id
+            },
+            event: {
+                _id: data.event._id,
+                type: event.type,
+                ts: body.event.ts
+            }
+        });
     } catch (err) {
         next(err);
     }

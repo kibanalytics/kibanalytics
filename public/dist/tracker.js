@@ -235,6 +235,7 @@ __webpack_require__.r(__webpack_exports__);
     let callback = null;
     let currentUrl = location.href;
     let currentRef = document.referrer;
+    let lastEvent = null;
 
     /* Collect metrics */
 
@@ -292,14 +293,26 @@ __webpack_require__.r(__webpack_exports__);
                 : { status: 'error', message: 'User agent failed to queue the data transfer' };
         }
 
-        return await fetch(url, {
+        const response = await fetch(url, {
             method: 'post',
             headers: {
                 'content-type': 'application/json'
             },
             body: JSON.stringify(body),
             credentials: 'include'
-        }).then(response => response.json());
+        });
+
+        const json = response.ok ? await response.json() : null;
+
+        lastEvent = {
+            data: body,
+            response: {
+                statusCode: response.status,
+                data: json
+            }
+        };
+
+        return lastEvent;
     };
 
     /* Handle events */
@@ -441,6 +454,9 @@ __webpack_require__.r(__webpack_exports__);
         set callback(fn) {
             callback = (typeof fn === 'function') ? fn : null;
             return callback;
+        },
+        get lastEvent() {
+            return lastEvent;
         },
         track,
         trackEvent,
