@@ -1,0 +1,6 @@
+## Default Logstash configuration from logstash-docker.
+## from https://github.com/elastic/logstash-docker/blob/master/build/logstash/config/logstash-full.yml
+#
+
+http.host: "0.0.0.0"
+queue.type: memory

@@ -65,8 +65,8 @@ docs/.vuepress/
 
 .npm
 
-.config/kibana/kibana.yml
-.config/logstash/pipeline/tracker.conf
-.config/redis/redis.conf
-.config/varnish/varnish_backends.vcl
-.config/twemproxy/twemproxy.yml
+.config/kibana/
+.config/logstash/
+.config/redis/
+.config/varnish/
+.config/twemproxy/
