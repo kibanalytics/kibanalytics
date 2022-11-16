@@ -6,10 +6,6 @@ const dashboard = require('./export.dashboards.json');
 
 const LOGGER_PREFIX = 'Load Dashboards Worker';
 const KIBANA_WAIT_MS = 12000;
-const KIBANA_HOST = process.env.NODE_ENV === 'development' ? 'localhost' : 'kibana';
-const KIBANA_PORT = 5601;
-const ELASTICSEARCH_HOST = process.env.NODE_ENV === 'development' ? 'localhost' : 'elasticsearch';
-const ELASTICSEARCH_PORT = 9200;
 
 (async () => {
     logger.info(`${LOGGER_PREFIX} - Started`);
@@ -67,7 +63,7 @@ async function isKibanaReady() {
             method: 'get',
             headers
         };
-        const response = await fetch(`http://${KIBANA_HOST}:${KIBANA_PORT}/api/task_manager/_health`, options);
+        const response = await fetch(`${process.env.KIBANA_SERVER_URI}/api/task_manager/_health`, options);
         const json = await response.json();
 
         return json.status === 'OK';
@@ -78,7 +74,7 @@ async function isKibanaReady() {
 
 async function getIndexPattern(pattern) {
     try {
-        const url = new URL(`http://${KIBANA_HOST}:${KIBANA_PORT}/api/saved_objects/_find`);
+        const url = new URL(`${process.env.KIBANA_SERVER_URI}/api/saved_objects/_find`);
 
         const params = {
             type: 'index-pattern',
@@ -125,7 +121,7 @@ async function createIndexPattern() {
         headers,
         body: JSON.stringify(body)
     };
-    const response = await fetch(`http://${KIBANA_HOST}:${KIBANA_PORT}/api/index_patterns/index_pattern`, options)
+    const response = await fetch(`${process.env.KIBANA_SERVER_URI}/api/index_patterns/index_pattern`, options)
         .then(response => response.json());
 
     return response.index_pattern;
@@ -145,7 +141,7 @@ async function setDefaultIndexPattern(index_id) {
         headers,
         body: JSON.stringify(body)
     };
-    const response = await fetch(`http://${KIBANA_HOST}:${KIBANA_PORT}/api/index_patterns/default`, options)
+    const response = await fetch(`${process.env.KIBANA_SERVER_URI}/api/index_patterns/default`, options)
         .then(response => response.json());
 
     return response.acknowledged === true;
@@ -165,7 +161,7 @@ async function createIndexTemplate(pattern, template) {
         headers,
         body: JSON.stringify(body)
     };
-    const response = await fetch(`http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}/_index_template/kibanalytics`, options)
+    const response = await fetch(`${process.env.ELASTICSEARCH_URI}/_index_template/kibanalytics`, options)
         .then(response => response.json());
 
     return response.acknowledged === true;
@@ -184,7 +180,7 @@ async function importDashboard(dashboard) {
         headers,
         body: JSON.stringify(body)
     };
-    return await fetch(`http://${KIBANA_HOST}:${KIBANA_PORT}/api/kibana/dashboards/import?force=true&exclude=index-pattern`, options)
+    return await fetch(`${process.env.KIBANA_SERVER_URI}/api/kibana/dashboards/import?force=true&exclude=index-pattern`, options)
         .then(response => response.json()).catch((err) => {
             console.log(err);
         });
