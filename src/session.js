@@ -3,6 +3,13 @@ const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
 const redisClient = require('./redis-session-client');
 
+let sameSite = true;
+if (!+process.env.EXPRESS_SESSION_COOKIE_SAME_SITE) {
+    sameSite = false
+} else if(['lax', 'none', 'strict'].includes(process.env.EXPRESS_SESSION_COOKIE_SAME_SITE.toLowerCase())) {
+    sameSite = process.env.EXPRESS_SESSION_COOKIE_SAME_SITE
+}
+
 module.exports = session({
     name: process.env.EXPRESS_SESSION_NAME,
     secret: process.env.EXPRESS_SESSION_SECRET,
@@ -15,9 +22,9 @@ module.exports = session({
             Cookies will be sent in all contexts, i.e. in responses to both first-party and cross-origin requests.
             If SameSite=None is set, the cookie Secure attribute must also be set (or the cookie will be blocked).
         */
-        sameSite: (process.env.NODE_ENV === 'production') ? 'none' : false,
+        sameSite,
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: !!+process.env.EXPRESS_SESSION_COOKIE_SECURE,
         maxAge: process.env.EXPRESS_SESSION_COOKIE_MAX_AGE
             ? parseInt(process.env.EXPRESS_SESSION_COOKIE_MAX_AGE)
             : 7776000000 // default to 90d
