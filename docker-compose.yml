@@ -11,7 +11,6 @@ services:
   # Twemproxy is used to shard redis horizontally
   #
   twemproxy:
-    profiles: ["production"]
     image: darioguarascio/twemproxy:latest
     container_name: kibanalytics.twemproxy
     hostname: twemproxy
@@ -92,6 +91,7 @@ services:
         max-file: ${DOCKER_LOG_MAX_FILE:-3}
 
   kibana:
+    profiles: ["development"]
     image: docker.elastic.co/kibana/kibana:7.14.1
     container_name: kibanalytics.kibana
     hostname: kibana
