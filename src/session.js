@@ -1,12 +1,13 @@
 const { v4: uuidv4 } = require('uuid');
 const session = require('express-session');
-const { store } = require('./redis-store');
+const RedisStore = require('connect-redis')(session);
+const redisClient = require('./redis-session-client');
 
 module.exports = session({
-    name: process.env.EXPRESS_SESSION_ID,
+    name: process.env.EXPRESS_SESSION_NAME,
     secret: process.env.EXPRESS_SESSION_SECRET,
-    store,
-    saveUninitialized: true,
+    store: new RedisStore({ client: redisClient }),
+    saveUninitialized: false,
     resave: false,
     genid: () => uuidv4(),
     cookie: {
@@ -17,6 +18,8 @@ module.exports = session({
         sameSite: (process.env.NODE_ENV === 'production') ? 'none' : false,
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        maxAge: parseInt((process.env.EXPRESS_COOKIE_TTL || 7776000) * 1000) // defaulted to 90d
+        maxAge: process.env.EXPRESS_SESSION_COOKIE_MAX_AGE
+            ? parseInt(process.env.EXPRESS_SESSION_COOKIE_MAX_AGE)
+            : 7776000000 // default to 90d
     }
 });

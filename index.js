@@ -19,6 +19,8 @@ const varnishHeaders = require('./src/varnish-headers');
 const controller = require('./src/controller');
 const errorHandler = require('./src/error-handler');
 
+const { EXPRESS_PORT } = require('./src/constants');
+
 const init = async () => {
     await redisSessionClient.connect();
     await redisQueueClient.connect();
@@ -97,8 +99,8 @@ const init = async () => {
     }
     app.use(errorHandler);
 
-    app.listen(process.env.EXPRESS_PORT, () => {
-        logger.info(`Express app listening on port ${process.env.EXPRESS_PORT}`);
+    app.listen(EXPRESS_PORT, () => {
+        logger.info(`Express app listening on port ${EXPRESS_PORT}`);
     });
 };
 

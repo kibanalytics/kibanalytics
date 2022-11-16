@@ -12,7 +12,7 @@ const fs = require('fs/promises');
     @TODO Maybe is time to create a config.json file as .env file is starting to get to big
  */
 const EVENT_FLOW_WITH_PAYLOAD = true; // @TODO make this configurable
-const SESSION_DURATION = 30 * 60000; // 30 minutes @TODO make this configurable
+const SESSION_DURATION = +process.env.EXPRESS_SESSION_DURATION || 1800000; // 30 minutes
 const UPGRADE_FILE_NAME = '.UPGRADE';
 
 const redisPing = util.promisify(redisClient.ping);
@@ -159,7 +159,7 @@ module.exports.collect = async (req, res, next) => {
         for (const plugin of plugins) plugin(req);
 
         session.lastEvent = data.event;
-        redisClient.rPush(process.env.TRACKING_KEY, JSON.stringify(data));
+        await redisClient.rPush(process.env.REDIS_QUEUE_KEY, JSON.stringify(data));
 
         res.json({
             status: 'success',

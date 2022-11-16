@@ -69,7 +69,7 @@ services:
         max-file: ${DOCKER_LOG_MAX_FILE:-3}
 
   elasticsearch:
-    profiles: ["development"]
+    profiles: ["local"]
     image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
     container_name: kibanalytics.elasticsearch
     hostname: elasticsearch
@@ -81,17 +81,16 @@ services:
     ports:
       - ${ELASTICSEARCH_LISTEN:-127.0.0.1:9200}:9200
     environment:
-      - "xpack.security.enabled=false"
-      - "discovery.seed_hosts=127.0.0.1:9300"
-      - "discovery.type=single-node"
-      - "ES_JAVA_OPTS=${ELASTICSEARCH_JAVA_OPTS:--Xms512m -Xmx512m}"
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=${ELASTICSEARCH_JAVA_OPTS:--Xms512m -Xmx512m}
     logging:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
         max-file: ${DOCKER_LOG_MAX_FILE:-3}
 
   kibana:
-    profiles: ["development"]
+    profiles: ["local"]
     image: docker.elastic.co/kibana/kibana:7.14.1
     container_name: kibanalytics.kibana
     hostname: kibana

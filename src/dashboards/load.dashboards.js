@@ -23,7 +23,7 @@ const ELASTICSEARCH_PORT = 9200;
     }
     logger.info(`${LOGGER_PREFIX} - Kibana ready`);
 
-    const pattern = `${process.env.TRACKING_KEY}-*`;
+    const pattern = `${process.env.REDIS_QUEUE_KEY}-*`;
 
     logger.info(`${LOGGER_PREFIX} - Checking index pattern ${pattern}`);
     let indexPattern = await getIndexPattern(pattern);
@@ -116,7 +116,7 @@ async function createIndexPattern() {
         override: false,
         refresh_fields: true,
         index_pattern: {
-            title: `${process.env.TRACKING_KEY}-*`,
+            title: `${process.env.REDIS_QUEUE_KEY}-*`,
             timeFieldName: '@timestamp'
         }
     };
