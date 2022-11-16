@@ -7,51 +7,58 @@ volumes:
     driver: local
 
 services:
-  # This service is used to shard redis horizontally
+  #
+  # Twemproxy is used to shard redis horizontally
+  #
   twemproxy:
-    profiles: [ "production" ]
+    profiles: ["production"]
     image: darioguarascio/twemproxy:latest
     container_name: kibanalytics.twemproxy
-    command: nutcracker -c /etc/twemproxy.yml
-    restart: always
+    hostname: twemproxy
+    restart: unless-stopped
     volumes:
       - .config/twemproxy/twemproxy.yml:/etc/twemproxy.yml
     ports:
-      - "${TWEMPROXY_LISTEN:-127.0.0.1:6301}:6301"
+      - ${TWEMPROXY_LISTEN:-127.0.0.1:6301}:6301
     logging:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
         max-file: ${DOCKER_LOG_MAX_FILE:-3}
+    command: nutcracker -c /etc/twemproxy.yml
 
-  # redis is used as session storage and event queue
+  #
+  # Redis is used as session storage and event queue
+  #
   redis:
     image: redis
     container_name: kibanalytics.redis
-    restart: unless-stopped
     hostname: redis
+    restart: unless-stopped
     volumes:
       - .config/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - ${REDIS_LISTEN:-127.0.0.1:6379}:6379
+    logging:
+      options:
+        max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
+        max-file: ${DOCKER_LOG_MAX_FILE:-3}
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
       interval: 5s
       timeout: 3s
       retries: 10
-    logging:
-      options:
-        max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
-        max-file: ${DOCKER_LOG_MAX_FILE:-3}
-    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
-    ports:
-      - "${REDIS_LISTEN:-127.0.0.1:6379}:6379"
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
 
-  # logstash is the agent that reads redis events
+  #
+  # Logstash is the agent that reads redis events
+  #
   logstash:
     image: docker.elastic.co/logstash/logstash:7.14.1
     container_name: kibanalytics.logtstash
+    hostname: logstash
+    restart: unless-stopped
     depends_on:
       - redis
-    restart: unless-stopped
-    hostname: logstash
     volumes:
       - .config/logstash/pipeline/:/usr/share/logstash/pipeline/
       - .config/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
@@ -63,22 +70,22 @@ services:
         max-file: ${DOCKER_LOG_MAX_FILE:-3}
 
   elasticsearch:
-    profiles: [ "development" ]
+    profiles: ["development"]
     image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
     container_name: kibanalytics.elasticsearch
+    hostname: elasticsearch
+    restart: unless-stopped
     depends_on:
       - logstash
-    restart: unless-stopped
-    hostname: elasticsearch
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - ${ELASTICSEARCH_LISTEN:-127.0.0.1:9200}:9200
     environment:
       - "xpack.security.enabled=false"
       - "discovery.seed_hosts=127.0.0.1:9300"
       - "discovery.type=single-node"
       - "ES_JAVA_OPTS=${ELASTICSEARCH_JAVA_OPTS:--Xms512m -Xmx512m}"
-    volumes:
-      - elasticsearch:/usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
     logging:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
@@ -87,37 +94,37 @@ services:
   kibana:
     image: docker.elastic.co/kibana/kibana:7.14.1
     container_name: kibanalytics.kibana
-    restart: unless-stopped
     hostname: kibana
+    restart: unless-stopped
     volumes:
       - .config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - ${KIBANA_LISTEN:-127.0.0.1:5601}:5601
     env_file:
       - .env
-    ports:
-      - "${KIBANA_LISTEN:-5601}:5601"
     logging:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
         max-file: ${DOCKER_LOG_MAX_FILE:-3}
 
   node:
-    profiles: [ "production" ]
+    profiles: ["production"]
     container_name: kibanalytics.node
+    hostname: node
     build: .
+    restart: unless-stopped
     depends_on:
       - redis
-    restart: unless-stopped
-    hostname: node
     volumes:
       - .:/app
       - node_modules:/app/node_modules/
     ports:
-      - ${EXPRESS_LISTEN:-80}:3000
+      - ${EXPRESS_LISTEN:-127.0.0.1:80}:3000
     working_dir: /app
-    command: node ./index.js
     env_file:
       - .env
     logging:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
         max-file: ${DOCKER_LOG_MAX_FILE:-3}
+    command: node ./index.js
