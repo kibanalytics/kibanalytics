@@ -1,12 +1,15 @@
+const os = require('os');
+const path = require('path');
+const fs = require('fs/promises');
 const util = require('util');
 const { v4: uuidv4 } = require('uuid');
+const isBot = require('isbot');
+
 const redisClient = require('./redis-queue-client');
 const validator = require('./validator');
 const validateCollectEndpoint = validator.getSchema('collectEndpoint');
 const plugins = require('./plugins');
-const os = require('os');
-const path = require('path');
-const fs = require('fs/promises');
+
 
 /*
     @TODO Maybe is time to create a config.json file as .env file is starting to get to big
@@ -87,6 +90,11 @@ module.exports.collect = async (req, res, next) => {
             req.session.user = {
                 _id: uuidv4(),
                 new: true,
+                /*
+                    This aims to identify "Good bots". Those who voluntarily identify themselves by setting a unique,
+                    preferably descriptive, user agent, usually by setting a dedicated request header.
+                 */
+                isBot: isBot(req.headers['user-agent']),
                 sessions: 1,
                 events: 0,
                 views: 0
