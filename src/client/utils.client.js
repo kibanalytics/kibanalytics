@@ -10,19 +10,6 @@ const hook = (_this, method, callback) => {
     };
 };
 
-const doNotTrack = () => {
-    const { doNotTrack, navigator, external } = window;
-
-    const msTrackProtection = 'msTrackingProtectionEnabled';
-    const msTracking = () => {
-        return external && msTrackProtection in external && external[msTrackProtection]();
-    };
-
-    const dnt = doNotTrack || navigator.doNotTrack || navigator.msDoNotTrack || msTracking();
-
-    return dnt == '1' || dnt === 'yes';
-};
-
 const adBlockEnabled = () => {
     let ade;
     const boe = document.getElementsByTagName('body')[0];
@@ -52,16 +39,6 @@ const getPrefixedAttributes = (attrPrefix, element) => {
         }, {});
 }
 
-const isJsonString = (str) => {
-    try {
-        JSON.parse(str);
-    } catch (e) {
-        console.warn('Invalid JSON string', str);
-        return false;
-    }
-    return true;
-}
-
 const getClassPrefixRegExp = (prefix) => {
     return new RegExp(`^${prefix}-([a-z]+)-([\\w]+[\\w-]*)$`);
 }
@@ -70,11 +47,9 @@ const getEventClassSelector = (prefix) => `[class*=\'${prefix}-\']`;
 
 export {
     hook,
-    doNotTrack,
     adBlockEnabled,
     cookiesEnabled,
     getPrefixedAttributes,
     getClassPrefixRegExp,
-    getEventClassSelector,
-    isJsonString
+    getEventClassSelector
 };

@@ -4,7 +4,6 @@ import classListener from './class-listener.client';
 import {
     adBlockEnabled,
     cookiesEnabled,
-    doNotTrack,
     hook,
     getClassPrefixRegExp,
     getEventClassSelector
@@ -44,7 +43,6 @@ import {
     /* Collect metrics */
 
     const collect = async (type, payload, sendBeacon = false) => {
-        if (doNotTrack()) return;
         const eventTs = (new Date()).getTime();
 
         const url = serverUrl;
@@ -275,19 +273,17 @@ import {
 
     /* Start */
 
-    if (!doNotTrack()) {
-        history.pushState = hook(history, 'pushState', handlePush);
-        history.replaceState = hook(history, 'replaceState', handlePush);
+    history.pushState = hook(history, 'pushState', handlePush);
+    history.replaceState = hook(history, 'replaceState', handlePush);
 
-        const update = () => {
-            if (document.readyState === 'complete') {
-                if (autoTrack) track('pageview');
-                addClassEvents(document);
-                observeDocument();
-            }
-        };
+    const update = () => {
+        if (document.readyState === 'complete') {
+            if (autoTrack) track('pageview');
+            addClassEvents(document);
+            observeDocument();
+        }
+    };
 
-        document.addEventListener('readystatechange', update, true);
-        update();
-    }
+    document.addEventListener('readystatechange', update, true);
+    update();
 })(window);

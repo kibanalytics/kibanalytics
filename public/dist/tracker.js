@@ -55,12 +55,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "adBlockEnabled": () => (/* binding */ adBlockEnabled),
 /* harmony export */   "cookiesEnabled": () => (/* binding */ cookiesEnabled),
-/* harmony export */   "doNotTrack": () => (/* binding */ doNotTrack),
 /* harmony export */   "getClassPrefixRegExp": () => (/* binding */ getClassPrefixRegExp),
 /* harmony export */   "getEventClassSelector": () => (/* binding */ getEventClassSelector),
 /* harmony export */   "getPrefixedAttributes": () => (/* binding */ getPrefixedAttributes),
-/* harmony export */   "hook": () => (/* binding */ hook),
-/* harmony export */   "isJsonString": () => (/* binding */ isJsonString)
+/* harmony export */   "hook": () => (/* binding */ hook)
 /* harmony export */ });
 
 
@@ -72,19 +70,6 @@ const hook = (_this, method, callback) => {
 
         return orig.apply(_this, args);
     };
-};
-
-const doNotTrack = () => {
-    const { doNotTrack, navigator, external } = window;
-
-    const msTrackProtection = 'msTrackingProtectionEnabled';
-    const msTracking = () => {
-        return external && msTrackProtection in external && external[msTrackProtection]();
-    };
-
-    const dnt = doNotTrack || navigator.doNotTrack || navigator.msDoNotTrack || msTracking();
-
-    return dnt == '1' || dnt === 'yes';
 };
 
 const adBlockEnabled = () => {
@@ -114,16 +99,6 @@ const getPrefixedAttributes = (attrPrefix, element) => {
             }
             return acc;
         }, {});
-}
-
-const isJsonString = (str) => {
-    try {
-        JSON.parse(str);
-    } catch (e) {
-        console.warn('Invalid JSON string', str);
-        return false;
-    }
-    return true;
 }
 
 const getClassPrefixRegExp = (prefix) => {
@@ -240,7 +215,6 @@ __webpack_require__.r(__webpack_exports__);
     /* Collect metrics */
 
     const collect = async (type, payload, sendBeacon = false) => {
-        if ((0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.doNotTrack)()) return;
         const eventTs = (new Date()).getTime();
 
         const url = serverUrl;
@@ -471,21 +445,19 @@ __webpack_require__.r(__webpack_exports__);
 
     /* Start */
 
-    if (!(0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.doNotTrack)()) {
-        history.pushState = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.hook)(history, 'pushState', handlePush);
-        history.replaceState = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.hook)(history, 'replaceState', handlePush);
+    history.pushState = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.hook)(history, 'pushState', handlePush);
+    history.replaceState = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.hook)(history, 'replaceState', handlePush);
 
-        const update = () => {
-            if (document.readyState === 'complete') {
-                if (autoTrack) track('pageview');
-                addClassEvents(document);
-                observeDocument();
-            }
-        };
+    const update = () => {
+        if (document.readyState === 'complete') {
+            if (autoTrack) track('pageview');
+            addClassEvents(document);
+            observeDocument();
+        }
+    };
 
-        document.addEventListener('readystatechange', update, true);
-        update();
-    }
+    document.addEventListener('readystatechange', update, true);
+    update();
 })(window);
 })();
 
