@@ -20,7 +20,6 @@ module.exports = {
                         scriptEventStartedDelta: { type: 'number' }
                     },
                     required: [
-                        'scriptStarted',
                         'started',
                         'scriptEventStartedDelta'
                     ]
