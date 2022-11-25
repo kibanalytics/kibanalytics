@@ -43,6 +43,10 @@ import {
     /* Collect metrics */
 
     const collect = async (type, payload, sendBeacon = false) => {
+        /*
+            eventTs will be used only to calculate scriptEventStartedDelta,
+            as it's going to be overrided by the server.
+        */
         const eventTs = (new Date()).getTime();
 
         const url = serverUrl;
@@ -53,7 +57,6 @@ import {
             referrer: currentRef,
             event: {
                 ts: {
-                    scriptStarted: scriptStartedTs,
                     started: eventTs,
                     scriptEventStartedDelta: eventTs - scriptStartedTs
                 },

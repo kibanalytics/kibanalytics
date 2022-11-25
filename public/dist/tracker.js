@@ -215,6 +215,10 @@ __webpack_require__.r(__webpack_exports__);
     /* Collect metrics */
 
     const collect = async (type, payload, sendBeacon = false) => {
+        /*
+            eventTs will be used only to calculate scriptEventStartedDelta,
+            as it's going to be overrided by the server.
+        */
         const eventTs = (new Date()).getTime();
 
         const url = serverUrl;
@@ -225,7 +229,6 @@ __webpack_require__.r(__webpack_exports__);
             referrer: currentRef,
             event: {
                 ts: {
-                    scriptStarted: scriptStartedTs,
                     started: eventTs,
                     scriptEventStartedDelta: eventTs - scriptStartedTs
                 },

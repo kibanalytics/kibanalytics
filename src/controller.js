@@ -21,8 +21,11 @@ const UPGRADE_FILE_NAME = '.UPGRADE';
 const redisPing = util.promisify(redisClient.ping);
 
 module.exports.collect = async (req, res, next) => {
+    const eventTs = (new Date()).getTime();
+
     try {
         const { body } = req;
+        body.event.ts.started = eventTs;
 
         if (!validateCollectEndpoint(body)) {
             res.status(422).json({

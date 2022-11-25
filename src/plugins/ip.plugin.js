@@ -29,6 +29,13 @@ module.exports = (req) => {
      */
     ipData.ll = ipData?.ll?.reverse();
 
+    /*
+        To avoid conflict field issue in Elasticsearch
+     */
+    if (!Array.isArray(ipData.range)) {
+        delete ipData.range;
+    }
+
     req.data.ip = {
         address,
         ...ipData
