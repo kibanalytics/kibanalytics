@@ -27,14 +27,14 @@ module.exports.collect = async (req, res, next) => {
         const { body } = req;
         body.event.ts.started = eventTs;
 
-        if (!validateCollectEndpoint(body)) {
-            res.status(422).json({
-                status: 'error',
-                message: 'Schema validation error',
-                errors: validateCollectEndpoint.errors
-            });
-            return;
-        }
+        // if (!validateCollectEndpoint(body)) {
+        //     res.status(422).json({
+        //         status: 'error',
+        //         message: 'Schema validation error',
+        //         errors: validateCollectEndpoint.errors
+        //     });
+        //     return;
+        // }
 
         const eventType = body.event.type;
 
