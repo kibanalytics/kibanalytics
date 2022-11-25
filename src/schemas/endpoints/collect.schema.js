@@ -16,7 +16,6 @@ module.exports = {
                 ts: {
                     type: 'object',
                     properties: {
-                        scriptStarted: { type: 'number' },
                         started: { type: 'number' },
                         scriptEventStartedDelta: { type: 'number' }
                     },
