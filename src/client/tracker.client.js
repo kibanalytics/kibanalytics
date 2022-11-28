@@ -192,8 +192,9 @@ import {
         }
     };
 
-    /* Handle history changes */
-
+    /*
+        Handle history changes
+     */
     const handlePush = (state, title, url) => {
         if (!url) return;
 
@@ -274,8 +275,9 @@ import {
         window.kbs = kbs;
     }
 
-    /* Start */
-
+    /*
+        Start
+     */
     history.pushState = hook(history, 'pushState', handlePush);
     history.replaceState = hook(history, 'replaceState', handlePush);
 
@@ -286,7 +288,16 @@ import {
             observeDocument();
         }
     };
-
     document.addEventListener('readystatechange', update, true);
+
+    /*
+        Handle back / forward browser button pageviews
+     */
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted === true) {
+            update();
+        }
+    }, true);
+
     update();
 })(window);

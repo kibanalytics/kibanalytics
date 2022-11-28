@@ -364,8 +364,9 @@ __webpack_require__.r(__webpack_exports__);
         }
     };
 
-    /* Handle history changes */
-
+    /*
+        Handle history changes
+     */
     const handlePush = (state, title, url) => {
         if (!url) return;
 
@@ -446,8 +447,9 @@ __webpack_require__.r(__webpack_exports__);
         window.kbs = kbs;
     }
 
-    /* Start */
-
+    /*
+        Start
+     */
     history.pushState = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.hook)(history, 'pushState', handlePush);
     history.replaceState = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.hook)(history, 'replaceState', handlePush);
 
@@ -458,8 +460,17 @@ __webpack_require__.r(__webpack_exports__);
             observeDocument();
         }
     };
-
     document.addEventListener('readystatechange', update, true);
+
+    /*
+        Handle back / forward browser button pageviews
+     */
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted === true) {
+            update();
+        }
+    }, true);
+
     update();
 })(window);
 })();
