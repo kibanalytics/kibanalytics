@@ -292,7 +292,9 @@ __webpack_require__.r(__webpack_exports__);
         return lastEvent;
     };
 
-    /* Handle events */
+    /*
+        Handle events
+     */
 
     const track = async (type = 'custom', data = {}, options = {}) => {
         const response = await collect(type, data, options.sendBeacon);
@@ -326,7 +328,9 @@ __webpack_require__.r(__webpack_exports__);
         trackEventList(list);
     };
 
-    /* Handle class events */
+    /*
+        Handle class events
+     */
 
     const addClassEvents = node => {
         const elements = node.querySelectorAll(eventClassSelector);
@@ -391,10 +395,6 @@ __webpack_require__.r(__webpack_exports__);
         observer.observe(document, { childList: true, subtree: true });
     };
 
-    // @TODO Referal Host
-
-    /* Global */
-
     // @TODO function to set all configurations at once
     // @TODO maybe transform this object to a JavaScript class
     // @TODO delay inicialization by html property, allowing initialization by JavaScript
@@ -456,22 +456,18 @@ __webpack_require__.r(__webpack_exports__);
     const update = () => {
         if (document.readyState === 'complete') {
             if (autoTrack) track('pageview');
+
             addClassEvents(document);
             observeDocument();
         }
     };
-    document.addEventListener('readystatechange', update, true);
 
     /*
-        Handle back / forward browser button pageviews
+        https://developer.mozilla.org/en-US/docs/Web/API/Window/pageshow_event
      */
     window.addEventListener('pageshow', (event) => {
-        if (event.persisted === true) {
-            update();
-        }
+        update();
     }, true);
-
-    update();
 })(window);
 })();
 
