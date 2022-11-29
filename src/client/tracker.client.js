@@ -275,25 +275,28 @@ import {
         window.kbs = kbs;
     }
 
-    /*
-        Start
-     */
+    /* Start */
+
     history.pushState = hook(history, 'pushState', handlePush);
     history.replaceState = hook(history, 'replaceState', handlePush);
 
     const update = () => {
         if (document.readyState === 'complete') {
             if (autoTrack) track('pageview');
-
             addClassEvents(document);
             observeDocument();
         }
     };
 
+    document.addEventListener('readystatechange', update, true);
     /*
         https://developer.mozilla.org/en-US/docs/Web/API/Window/pageshow_event
-     */
-    window.addEventListener('pageshow', () => {
-        update();
+    */
+    window.addEventListener('pageshow', (ev) => {
+        if (ev.persisted === true) {
+            update();
+        }
     }, true);
+
+    update();
 })(window);

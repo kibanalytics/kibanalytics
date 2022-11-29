@@ -447,27 +447,30 @@ __webpack_require__.r(__webpack_exports__);
         window.kbs = kbs;
     }
 
-    /*
-        Start
-     */
+    /* Start */
+
     history.pushState = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.hook)(history, 'pushState', handlePush);
     history.replaceState = (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.hook)(history, 'replaceState', handlePush);
 
     const update = () => {
         if (document.readyState === 'complete') {
             if (autoTrack) track('pageview');
-
             addClassEvents(document);
             observeDocument();
         }
     };
 
+    document.addEventListener('readystatechange', update, true);
     /*
         https://developer.mozilla.org/en-US/docs/Web/API/Window/pageshow_event
-     */
-    window.addEventListener('pageshow', (event) => {
-        update();
+    */
+    window.addEventListener('pageshow', (ev) => {
+        if (ev.persisted === true) {
+            update();
+        }
     }, true);
+
+    update();
 })(window);
 })();
 
