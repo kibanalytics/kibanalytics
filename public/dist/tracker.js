@@ -461,14 +461,6 @@ __webpack_require__.r(__webpack_exports__);
     };
 
     document.addEventListener('readystatechange', update, true);
-    /*
-        https://developer.mozilla.org/en-US/docs/Web/API/Window/pageshow_event
-    */
-    window.addEventListener('pageshow', (ev) => {
-        if (ev.persisted === true) {
-            update();
-        }
-    }, true);
 
     update();
 })(window);
