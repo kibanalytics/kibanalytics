@@ -186,7 +186,8 @@ It's necessary to install Docker and Docker-Compose to the host where Kibanalyti
 [Docker-Compose instalation setup](https://docs.docker.com/compose/install/)
 
 After completing all the setup steps from Docker and Docker-Compose, to start Kibanalytics using 
-the provided .env file with default configuration values, just run:
+the default configuration values, rename the file ".env.example" to ".env"and the folder ".config.example" 
+to ".config", then run the following command:
 
 ```bash
 docker-compose --profile local --profile production up -d --build
