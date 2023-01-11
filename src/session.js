@@ -3,12 +3,12 @@ const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
 const redisClient = require('./redis-session-client');
 
-let sameSite = true;
-if (!+process.env.EXPRESS_SESSION_COOKIE_SAME_SITE) {
-    sameSite = false
-} else if(['lax', 'none', 'strict'].includes(process.env.EXPRESS_SESSION_COOKIE_SAME_SITE.toLowerCase())) {
+const expressSessionCookieSameSite = process.env.EXPRESS_SESSION_COOKIE_SAME_SITE.toLowerCase();
+
+let sameSite;
+if (['lax', 'none', 'strict'].includes(expressSessionCookieSameSite)) {
     sameSite = process.env.EXPRESS_SESSION_COOKIE_SAME_SITE
-}
+} else sameSite = expressSessionCookieSameSite !== '0';
 
 module.exports = session({
     name: process.env.EXPRESS_SESSION_NAME,

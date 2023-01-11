@@ -271,6 +271,12 @@ const kbs = {
     set callback(fn) {},
 
     /**
+     * Get last tracked event data
+     * @return {Object} - Object with event data
+     */
+    lastEvent() {},
+
+    /**
      * Track custom events
      * @param {string} type - Event type
      * @param {Object} data - Any custom data

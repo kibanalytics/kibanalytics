@@ -4,7 +4,11 @@ Kibanalytics has a default dashboard for viewing the collected data.
 
 ![Image from images folder](~@source/images/dashboard.png)
 
-To load the default dashboard at first start, remember to set KIBANA_LOAD_DEFAULT_DASHBOARDS enviroment variable to "1".
+To load the default dashboard, remember to run the following command after the first start of all Kibanalytics services.
+
+```bash
+docker-compose run node npm run load-dashboards
+```
 
 ::: warning
 Kibana index needs at last one entry in database to dynamic load properties, so before open the dashboard, ensure to have

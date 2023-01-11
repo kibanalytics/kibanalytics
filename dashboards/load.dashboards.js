@@ -1,44 +1,43 @@
 const fetch = require('node-fetch');
 const delay = require('delay');
-const logger = require('../logger');
+const logger = require('../src/logger');
 const indexTemplate = require('./index-template.dashboards.json');
 const dashboard = require('./export.dashboards.json');
 
-const LOGGER_PREFIX = 'Load Dashboards Worker';
 const KIBANA_WAIT_MS = 12000;
 
 (async () => {
-    logger.info(`${LOGGER_PREFIX} - Started`);
+    logger.info(`Started`);
     let kibanaReady = false;
 
-    logger.info(`${LOGGER_PREFIX} - Checking if Kibana is ready...`);
+    logger.info(`Checking if Kibana is ready...`);
     while (!await isKibanaReady()) {
         await delay(KIBANA_WAIT_MS);
-        logger.info(`${LOGGER_PREFIX} - Waiting for Kibana...`);
+        logger.info(`Waiting for Kibana...`);
         kibanaReady = await isKibanaReady();
     }
-    logger.info(`${LOGGER_PREFIX} - Kibana ready`);
+    logger.info(`Kibana ready`);
 
     const pattern = `${process.env.REDIS_QUEUE_KEY}-*`;
 
-    logger.info(`${LOGGER_PREFIX} - Checking index pattern ${pattern}`);
+    logger.info(`Checking index pattern ${pattern}`);
     let indexPattern = await getIndexPattern(pattern);
 
     if (!indexPattern) {
-        logger.info(`${LOGGER_PREFIX} - Creating index pattern ${pattern}`);
+        logger.info(`Creating index pattern ${pattern}`);
         indexPattern = await createIndexPattern(pattern);
 
-        logger.info(`${LOGGER_PREFIX} - Setting index pattern ${pattern} as default`);
+        logger.info(`Setting index pattern ${pattern} as default`);
         await setDefaultIndexPattern(indexPattern.id);
 
-        logger.info(`${LOGGER_PREFIX} - Creating template for index pattern ${pattern}`);
+        logger.info(`Creating template for index pattern ${pattern}`);
         await createIndexTemplate(pattern, indexTemplate);
     }
 
     /*
      *  This implementation assumes that the entire dashboard uses only one type of index pattern
      */
-    logger.info(`${LOGGER_PREFIX} - Setting dashboard index reference`);
+    logger.info(`Setting dashboard index reference`);
     for (const entry of dashboard) {
         for (const reference of entry.references) {
             if (reference.type === 'index-pattern') {
@@ -47,10 +46,10 @@ const KIBANA_WAIT_MS = 12000;
         }
     }
 
-    logger.info(`${LOGGER_PREFIX} - Importing dashboard`);
+    logger.info(`Importing dashboard`);
     await importDashboard(dashboard);
 
-    logger.info(`${LOGGER_PREFIX} - Finished`);
+    logger.info(`Finished`);
     process.exit(0);
 })();
 

@@ -121,7 +121,7 @@ services:
       - .:/app
       - node_modules:/app/node_modules/
     ports:
-      - ${EXPRESS_LISTEN:-127.0.0.1:80}:3000
+      - ${NODE_LISTEN:-127.0.0.1:3000}:3000
     working_dir: /app
     env_file:
       - .env

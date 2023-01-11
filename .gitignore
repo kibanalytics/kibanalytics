@@ -46,27 +46,11 @@ Thumbs.db
 *.mov
 *.wmv
 
-.bash_history
-.bashrc
-.cloud-locale-test.skip
-.profile
-.ssh/
-.wget-hsts
-
 __tests__/output
-elk/logstash/pipeline/tracker.conf
-.env
-node_modules
+
 .temp
 .cache
-package-lock.json
+.config
 
-docs/.vuepress/
-
-.npm
-
-.config/kibana/
-.config/logstash/
-.config/redis/
-.config/varnish/
-.config/twemproxy/
+.env
+.env.dev

@@ -1,0 +1,1 @@
+const t={key:"v-52062726",path:"/introduction.html",title:"Kibanalytics",lang:"en-US",frontmatter:{},excerpt:"",headers:[],git:{updatedTime:1651754455e3,contributors:[{name:"Bernard Costa",email:"costa.ber95@gmail.com",commits:1}]},filePathRelative:"introduction.md"};export{t as data};

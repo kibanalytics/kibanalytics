@@ -1,13 +1,6 @@
 kbs.serverUrl = '/collect';
-
 kbs.eventClassPrefix = 'kbs';
-
 kbs.serverSideData = { foo: 'bar' };
-console.log('serverSideData', kbs.serverSideData);
-
-kbs.callback = (response) => {
-    console.log('callback', response);
-}
 
 document.addEventListener('DOMContentLoaded', () => {
     const buttonEl03 = document.getElementById('button03');
@@ -49,8 +42,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }];
 
     kbs.trackEventList(eventList);
-    console.log('trackEventList loaded.');
-
-    const eventListUrl = '/event-list.json';
-    kbs.trackEventListUrl(eventListUrl).then(() => console.log('trackEventListUrl loaded.'));
 });

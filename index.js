@@ -2,7 +2,6 @@ require('dotenv').config();
 
 const os = require('os');
 const cluster = require('cluster');
-const { Worker } = require('worker_threads');
 const logger = require('./src/logger');
 const redisSessionClient = require('./src/redis-session-client');
 const redisQueueClient = require('./src/redis-queue-client');
@@ -15,7 +14,6 @@ const helmet = require('helmet');
 const cors = require('cors');
 const corsOptions = require('./src/cors-options');
 const session = require('./src/session');
-const varnishHeaders = require('./src/varnish-headers');
 const controller = require('./src/controller');
 const errorHandler = require('./src/error-handler');
 
@@ -40,10 +38,6 @@ const init = async () => {
             dsn: process.env.SENTRY_DSN
         });
         app.use(Sentry.Handlers.requestHandler());
-    }
-
-    if (!!+process.env.EXPRESS_VARNISH_HEADERS) {
-        app.use(varnishHeaders);
     }
 
     if (!!+process.env.EXPRESS_GZIP) {
@@ -120,10 +114,4 @@ if (clusterWorkerSize > 1) {
     }
 } else {
     init();
-}
-
-if (!!+process.env.KIBANA_LOAD_DEFAULT_DASHBOARDS) {
-    const loadDashboardsWorker = new Worker('./src/dashboards/load.dashboards.js');
-    loadDashboardsWorker.on('error', (err) => logger.error(err?.stack));
-    loadDashboardsWorker.on('exit', (code) => logger.info(`Load Dashboards Worker has stopped with code ${code}`));
 }
