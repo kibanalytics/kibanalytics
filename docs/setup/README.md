@@ -1,6 +1,16 @@
 # Setup
 
-To start Kibanalytics, it's mandatory to provide some basic configurations.
+## Git & Source Code
+
+[Git](https://git-scm.com/) is a free and open source distributed version control system.
+
+The easiest way to get Kibanalytics source code is by installing Git and running the following command:
+
+```bash
+git clone https://github.com/kibanalytics/kibanalytics.git
+```
+
+To start Kibanalytics, it's mandatory to provide some basic configuration files.
 
 ## Environment Variables
 
@@ -8,7 +18,11 @@ Kibanalytics will look for a .env file at the root of the project folder to appl
 
 ::: tip
 Use .env.example as base for your environment variables setup.
-If you just want start straightaway, just rename .env.example to .env and use all default values. 
+If you just want start straightaway, just rename .env.example to .env and use all default values.
+
+```bash
+cp .env.example .env
+```
 :::
 
 | Variable                                 |   Type   |                      Allowed Values |
@@ -186,11 +200,13 @@ It's necessary to install Docker and Docker-Compose to the host where Kibanalyti
 [Docker-Compose instalation setup](https://docs.docker.com/compose/install/)
 
 After completing all the setup steps from Docker and Docker-Compose, to start Kibanalytics using 
-the default configuration values, rename the file ".env.example" to ".env"and the folder ".config.example" 
-to ".config", then run the following command:
+the default configuration, run the following commands:
 
 ```bash
-docker-compose --profile local --profile production up -d --build
+cd kibanalytics
+cp .env.example .env
+cp -r .config.example .config
+docker-compose --profile local --profile production up --build
 ```
 
 If you're starting Kibanalytics for the first time, it's necessary to [create a Kibana index pattern](https://www.elastic.co/guide/en/kibana/7.17/index-patterns.html) 
@@ -204,7 +220,7 @@ docker-compose run node npm run load-dashboards
 ```
 
 After all containers started, you can open Kibana to check events and metrics 
-by accessing [http://localhost:5601/](http://localhost:5601/).
+by accessing [http://localhost:5601/app/dashboards](http://localhost:5601/app/dashboards).
 
 ::: tip
 Kibana server take some minutes to boot, so don't panic if you try to access the Kibana URL and nothing shows up.
@@ -216,7 +232,7 @@ If you started Kibanalytics with NODE_ENV=development and EXPRESS_PORT=3000, you
 ## Advanced Configurations
 
 It's possible to provide some aditional advanced configurations to Kibanalytics engine gears by editing the corresponding
-files in "/config" folder.
+files in "/.config" folder.
 
 ### Redis
 
