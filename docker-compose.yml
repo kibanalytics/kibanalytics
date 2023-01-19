@@ -82,8 +82,9 @@ services:
     ports:
       - ${ELASTICSEARCH_LISTEN:-127.0.0.1:9200}:9200
     environment:
-      - xpack.security.enabled=false
       - discovery.type=single-node
+      - xpack.security.enabled=${ELASTICSEARCH_SECURITY:-true}
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-<your-elasticsearch-password>}
       - ES_JAVA_OPTS=${ELASTICSEARCH_JAVA_OPTS:--Xms512m -Xmx512m}
     logging:
       options:
@@ -104,6 +105,9 @@ services:
       - ${KIBANA_LISTEN:-127.0.0.1:5601}:5601
     env_file:
       - .env
+    environment:
+      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME:-elastic}
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD:-<your-elasticsearch-password>}
     logging:
       options:
         max-size: ${DOCKER_LOG_MAX_SIZE:-10m}

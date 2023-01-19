@@ -2,14 +2,15 @@ const {
     description
 } = require('../../package');
 
-let nav = [{
-    text: 'Home',
-    link: '/README.md',
-    children: [{
-        text: 'Quick Intro',
+let nav = [
+    {
+        text: 'Introduction',
         link: '/introduction.md'
-    }]
-},
+    },
+    {
+        text: 'Quick Start',
+        link: '/quick-start/'
+    },
     {
         text: 'Setup',
         link: '/setup/'

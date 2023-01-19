@@ -1,30 +1,22 @@
-# Kibanalytics
+# Quick Start
 
-This project aims to make use of the ELK stack to collect events from web pages and visualize them, offering the same kind of insights that Google Analytics does.
-
-The reason behind this project is to provide an alternative to GA that offers data ownership, adblocker avoidance, powerful aggregations, grained filtering and big data storage.
-
-For full documentation, check [https://kibanalytics.io/](https://kibanalytics.io/)
-
-## Quick Start
-
-### Requirements
+## Requirements
 
 Host server with the following installed software:
 
 - [Git](https://git-scm.com/)
 - [Docker-Compose](https://docs.docker.com/compose/)
 
-### Step-By-Step
+## Step-By-Step
 
-#### 1. Download Kibanalytics Code Repository
+### 1. Download Kibanalytics Code Repository
 
 ```bash
 git clone https://github.com/kibanalytics/kibanalytics.git
 cd kibanalytics
 ```
 
-#### 2. Copy Default Configuration Files
+### 2. Copy Default Configuration Files
 
 By default, all CORS origins are allowed to call Kibanalytics back-end server.
 
@@ -33,25 +25,26 @@ cp .env.example .env
 cp -r .config.example .config
 ```
 
-It's recomended to change the default EXPRESS_SESSION_SECRET environment variable value
-if running Kibanalytics in production.
+::: warning
+It's recomended to change the EXPRESS_SESSION_SECRET and ELASTICSEARCH_PASSWORD environment variables default values
+before running Kibanalytics in production.
+:::
 
-#### 3. Start Docker Services
+### 3. Start Docker Services
 
 ```bash
 docker-compose --profile local --profile production up -d --build
 ```
 
-#### 4. Load Default Dashboards
+### 4. Load Default Dashboards
 
 ```bash
 docker-compose exec node npm run load-dashboards
 ```
 
-#### 5. Add Front-End Tracking Library
+### 5. Add Front-End Tracking Library
 
-It's recomended to change the EXPRESS_SESSION_SECRET and ELASTICSEARCH_PASSWORD environment variables default values
-before running Kibanalytics in production.
+Remember to change the server URL according to your server hostname / domain if you're not running on localhost.
 
 ```html
 <!DOCTYPE html>
@@ -74,6 +67,6 @@ before running Kibanalytics in production.
 
 Alternatively you can access [http://localhost:3000](http://my-kibanalytics-server-host:3000) to interact with some example pages.
 
-#### 6. Open Example Dashboard
+### 6. Open Example Dashboard
 
 By accessing [http://localhost:5601/app/dashboards](http://localhost:5601/app/dashboards).

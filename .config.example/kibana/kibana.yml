@@ -6,3 +6,8 @@ server.name: kibana
 server.host: "0.0.0.0"
 elasticsearch.hosts: ["${ELASTICSEARCH_URI}"]
 xpack.monitoring.ui.container.elasticsearch.enabled: false
+xpack.security.authc.providers:
+  basic.basic:
+    order: 0
+    icon: "logoElasticsearch"
+    hint: "Typically for administrators"

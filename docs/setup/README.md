@@ -1,6 +1,12 @@
 # Setup
 
-## Git & Source Code
+## Requirements
+
+The only requirement for Kibanalytics is a server with [Git](https://git-scm.com/) and 
+[Docker-Compose](https://docs.docker.com/compose/) installed. All required services are build and abtracted Docker
+containers.
+
+## Source Code
 
 [Git](https://git-scm.com/) is a free and open source distributed version control system.
 
@@ -10,7 +16,7 @@ The easiest way to get Kibanalytics source code is by installing Git and running
 git clone https://github.com/kibanalytics/kibanalytics.git
 ```
 
-To start Kibanalytics, it's mandatory to provide some basic configuration files.
+Before starting Kibanalytics, it's mandatory to provide some basic configuration files and environment variales.
 
 ## Environment Variables
 
@@ -25,31 +31,43 @@ cp .env.example .env
 ```
 :::
 
-| Variable                                 |   Type   |                      Allowed Values |
-|:-----------------------------------------|:--------:|------------------------------------:|
-| NODE_ENV                                 |  string  |         'development', 'production' |
-| NODE_CLUSTER                             |   int    |                                0, 1 |
-| NODE_LISTEN                              |  string  |       Valid host IP and port number |
-| EXPRESS_HELMET                           |   int    |                                0, 1 | 
-| EXPRESS_GZIP                             |   int    |                                0, 1 |
-| EXPRESS_CORS                             |   int    |                                0, 1 |
-| EXPRESS_ALLOWED_ORIGINS                  | [string] |                    Any valid RegExp |
-| EXPRESS_SESSION_NAME                     |  string  |                          Any string |
-| EXPRESS_SESSION_SECRET                   |  string  |                          Any string |
-| EXPRESS_SESSION_COOKIE_MAX_AGE           |   int    |                         Number >= 0 |
-| EXPRESS_SESSION_COOKIE_SAME_SITE         |  string  |  '0', '1', lax', 'none' or 'strict' |
-| EXPRESS_SESSION_COOKIE_SECURE            |   int    |                                0, 1 |
-| EXPRESS_SESSION_DURATION                 |   int    |                         Number >= 0 |
-| EXPRESS_VALIDATE_JSON_SCHEMA             |   int    |                                0, 1 |
-| EXPRESS_PUBLIC_FOLDER                    |   int    |                                0, 1 |
-| SENTRY_DSN                               |  string  |                Valid Sentry DSN URL |
-| LOGSTASH_REDIS_HOST                      |  string  |                    Valid Redis host |
-| LOGSTASH_REDIS_PORT                      |   int    |        Valid Redis host port number |
-| REDIS_QUEUE_SERVER_URI                   |  string  |                     Valid Redis URI |
-| REDIS_SESSION_SERVER_URI                 |  string  |                     Valid Redis URI |
-| ELASTICSEARCH_URI                        |  string  |             Valid Elasticsearch URI |
-| DOCKER_LOG_MAX_SIZE                      |  string  | Number >= 1 suffixed with magnitude |
-| DOCKER_LOG_MAX_FILE                      |   int    |                         Number >= 1 |
+::: warning
+It's recomended to change the EXPRESS_SESSION_SECRET and ELASTICSEARCH_PASSWORD environment variables default values
+before running Kibanalytics in production.
+:::
+
+| Variable                         |   Type   |                           Allowed Values |
+|:---------------------------------|:--------:|-----------------------------------------:|
+| NODE_ENV                         |  string  |              'development', 'production' |
+| NODE_CLUSTER                     |   int    |                                     0, 1 |
+| NODE_LISTEN                      |  string  |            Valid host IP and port number |
+| EXPRESS_HELMET                   |   int    |                                     0, 1 | 
+| EXPRESS_GZIP                     |   int    |                                     0, 1 |
+| EXPRESS_CORS                     |   int    |                                     0, 1 |
+| EXPRESS_ALLOWED_ORIGINS          | [string] |                         Any valid RegExp |
+| EXPRESS_SESSION_NAME             |  string  |                               Any string |
+| EXPRESS_SESSION_SECRET           |  string  |                               Any string |
+| EXPRESS_SESSION_COOKIE_MAX_AGE   |   int    |                              Number >= 0 |
+| EXPRESS_SESSION_COOKIE_SAME_SITE |  string  |       '0', '1', lax', 'none' or 'strict' |
+| EXPRESS_SESSION_COOKIE_SECURE    |   int    |                                     0, 1 |
+| EXPRESS_SESSION_DURATION         |   int    |                              Number >= 0 |
+| EXPRESS_VALIDATE_JSON_SCHEMA     |   int    |                                     0, 1 |
+| EXPRESS_PUBLIC_FOLDER            |   int    |                                     0, 1 |
+| SENTRY_DSN                       |  string  |                     Valid Sentry DSN URL |
+| LOGSTASH_REDIS_HOST              |  string  |                         Valid Redis host |
+| LOGSTASH_REDIS_PORT              |   int    |             Valid Redis host port number |
+| REDIS_LISTEN                     |  string  |            Valid host IP and port number |
+| REDIS_QUEUE_SERVER_URI           |  string  |                          Valid Redis URI |
+| REDIS_SESSION_SERVER_URI         |  string  |                          Valid Redis URI |
+| TWEMPROXY_LISTEN                 |  string  |            Valid host IP and port number |
+| ELASTICSEARCH_LISTEN             |  string  |            Valid host IP and port number |
+| ELASTICSEARCH_URI                |  string  |                  Valid Elasticsearch URI |
+| ELASTICSEARCH_SECURITY           |   bool   |                              true, false |
+| ELASTICSEARCH_USERNAME           |  string  |                               Any string |
+| ELASTICSEARCH_PASSWORD           |  string  |                               Any string |
+| KIBANA_LISTEN                    |  string  |            Valid host IP and port number |
+| DOCKER_LOG_MAX_SIZE              |  string  |      Number >= 1 suffixed with magnitude |
+| DOCKER_LOG_MAX_FILE              |   int    |                              Number >= 1 |
 
 ### NODE_ENV
 
@@ -66,7 +84,7 @@ distributing the load of requests to the web server.
 
 ### NODE_LISTEN
 
-Expose Node Docker service host ip and port number for connections.
+Expose Node Docker service host ip and port number for external connections.
 
 ### EXPRESS_HELMET
 
@@ -162,6 +180,10 @@ Redis queue server hostname.
 
 Redis queue server port.
 
+### REDIS_LISTEN
+
+Expose Redis Docker service host ip and port number for external connections.
+
 ### REDIS_QUEUE_SERVER_URI
 
 Redis queue server connection URI. Needs to use the same values from LOGSTASH_REDIS_HOST and LOGSTASH_REDIS_PORT variables.
@@ -170,6 +192,14 @@ This is necessary because some services needs to use hostname / port and others 
 ### REDIS_SESSION_SERVER_URI
 
 Redis session server connection URI.
+
+### TWEMPROXY_LISTEN
+
+Expose Twemproxy Docker service host ip and port number for external connections.
+
+### ELASTICSEARCH_LISTEN
+
+Expose Elasticsearch Docker service host ip and port number for external connections.
 
 ### ELASTICSEARCH_URI
 
@@ -180,6 +210,23 @@ use the value "http://elasticsearch:9200" as it is an alias to the internal Dock
 
 If NODE_ENV is set to "development", Node.js server will override ELASTICSEARCH_URI value to "http://localhost:9200".
 
+### ELASTICSEARCH_SECURITY
+
+Enable or disable Elasticsearch security. By enabling this flag, Kibana access will also
+require an username & password for access.
+
+### ELASTICSEARCH_USERNAME
+
+Elasticsearch username. Used with ELASTICSEARCH_SECURITY=true.
+
+### ELASTICSEARCH_PASSWORD
+
+Elasticsearch password. Used with ELASTICSEARCH_SECURITY=true.
+
+### KIBANA_LISTEN
+
+Expose Kibana Docker service host ip and port number for external connections.
+
 ### DOCKER_LOG_MAX_SIZE
 
 Docker log file max size.
@@ -188,12 +235,12 @@ Docker log file max size.
 
 Docker log files max count.
 
-## Docker-Compose
+## Install
 
 [Docker-Compose](https://docs.docker.com/compose/) is a tool that helps to define and share multi-container applications. 
 As Kibanalytics is composed by a stack of open source projects, it's easier for a quick start to use containers.
 
-It's necessary to install Docker and Docker-Compose to the host where Kibanalytics will run.
+It's necessary to install Docker and Docker-Compose to the host/server where Kibanalytics will run.
 
 [Docker instalation setup](https://docs.docker.com/engine/install/)
 
@@ -206,7 +253,7 @@ the default configuration, run the following commands:
 cd kibanalytics
 cp .env.example .env
 cp -r .config.example .config
-docker-compose --profile local --profile production up --build
+docker-compose --profile local --profile production up -d --build
 ```
 
 If you're starting Kibanalytics for the first time, it's necessary to [create a Kibana index pattern](https://www.elastic.co/guide/en/kibana/7.17/index-patterns.html) 
@@ -216,7 +263,7 @@ To make this process easier, we provide a script to automate this process and al
 script, execute the following command:
 
 ```bash
-docker-compose run node npm run load-dashboards
+docker-compose exec node npm run load-dashboards
 ```
 
 After all containers started, you can open Kibana to check events and metrics 
@@ -226,8 +273,8 @@ by accessing [http://localhost:5601/app/dashboards](http://localhost:5601/app/da
 Kibana server take some minutes to boot, so don't panic if you try to access the Kibana URL and nothing shows up.
 :::
 
-If you started Kibanalytics with NODE_ENV=development and EXPRESS_PORT=3000, you can also access 
-[http://localhost:3000/](http://localhost:3000/) to interact with some example pages to generate events. 
+If you started Kibanalytics with EXPRESS_PUBLIC_FOLDER=1 and EXPRESS_PORT=3000, you can also access 
+[http://localhost:3000](http://localhost:3000) to interact with some example pages to generate events. 
 
 ## Advanced Configurations
 
@@ -238,7 +285,7 @@ files in "/.config" folder.
 
 To provide aditional settings to the local Redis instance, edit ".config/redis/redis.conf" file.
 For more information about the available setting options, please check 
-[Redis configuration](https://redis.io/docs/manual/config/) docs.
+[Redis configuration](https://redis.io/docs/manual/config) docs.
 
 ### Twemproxy
 

@@ -51,6 +51,8 @@ __tests__/output
 .temp
 .cache
 .config
+.dist
 
 .env
 .env.dev
+/docs/.vuepress/dist/

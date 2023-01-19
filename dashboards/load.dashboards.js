@@ -53,11 +53,23 @@ const KIBANA_WAIT_MS = 12000;
     process.exit(0);
 })();
 
+function getAuthenticationHeaders() {
+    const username = process.env.ELASTICSEARCH_USERNAME;
+    const password = process.env.ELASTICSEARCH_PASSWORD;
+    const credentials = Buffer.from(`${username}:${password}`).toString('base64');
+
+    return `Basic ${credentials}`
+}
+
 async function isKibanaReady() {
     try {
         const headers = {
             'content-type': 'application/json'
         };
+        if (process.env.ELASTICSEARCH_SECURITY.toLowerCase() === 'true') {
+            headers['Authorization'] = getAuthenticationHeaders()
+        }
+
         const options = {
             method: 'get',
             headers
@@ -87,6 +99,9 @@ async function getIndexPattern(pattern) {
             'content-type': 'application/json',
             'kbn-xsrf': 'reporting'
         };
+        if (process.env.ELASTICSEARCH_SECURITY.toLowerCase() === 'true') {
+            headers['Authorization'] = getAuthenticationHeaders()
+        }
 
         const options = {
             method: 'get',
@@ -107,6 +122,9 @@ async function createIndexPattern() {
         'content-type': 'application/json',
         'kbn-xsrf': 'reporting'
     };
+    if (process.env.ELASTICSEARCH_SECURITY.toLowerCase() === 'true') {
+        headers['Authorization'] = getAuthenticationHeaders()
+    }
     const body = {
         override: false,
         refresh_fields: true,
@@ -131,6 +149,9 @@ async function setDefaultIndexPattern(index_id) {
         'content-type': 'application/json',
         'kbn-xsrf': 'reporting'
     };
+    if (process.env.ELASTICSEARCH_SECURITY.toLowerCase() === 'true') {
+        headers['Authorization'] = getAuthenticationHeaders()
+    }
     const body = {
         index_pattern_id: index_id,
         force: true
@@ -150,6 +171,9 @@ async function createIndexTemplate(pattern, template) {
     const headers = {
         'content-type': 'application/json'
     };
+    if (process.env.ELASTICSEARCH_SECURITY.toLowerCase() === 'true') {
+        headers['Authorization'] = getAuthenticationHeaders()
+    }
     const body = {
         index_patterns: [pattern],
         priority: 1,
@@ -171,6 +195,9 @@ async function importDashboard(dashboard) {
         'content-type': 'application/json',
         'kbn-xsrf': 'reporting'
     };
+    if (process.env.ELASTICSEARCH_SECURITY.toLowerCase() === 'true') {
+        headers['Authorization'] = getAuthenticationHeaders()
+    }
     const body = {
         objects: dashboard
     };
