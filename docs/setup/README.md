@@ -213,7 +213,7 @@ If NODE_ENV is set to "development", Node.js server will override ELASTICSEARCH_
 ### ELASTICSEARCH_SECURITY
 
 Enable or disable Elasticsearch security. By enabling this flag, Kibana access will also
-require an username & password for access.
+require an username & password.
 
 ### ELASTICSEARCH_USERNAME
 

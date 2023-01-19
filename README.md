@@ -33,8 +33,8 @@ cp .env.example .env
 cp -r .config.example .config
 ```
 
-It's recomended to change the default EXPRESS_SESSION_SECRET environment variable value
-if running Kibanalytics in production.
+It's recomended to change the EXPRESS_SESSION_SECRET, ELASTICSEARCH_PASSWORD environment variables default values
+and set to 'true' ELASTICSEARCH_SECURITY before running Kibanalytics in production.
 
 #### 3. Start Docker Services
 
@@ -50,8 +50,7 @@ docker-compose exec node npm run load-dashboards
 
 #### 5. Add Front-End Tracking Library
 
-It's recomended to change the EXPRESS_SESSION_SECRET and ELASTICSEARCH_PASSWORD environment variables default values
-before running Kibanalytics in production.
+Remember to change the server URL according to your server hostname / domain if you're not running on localhost.
 
 ```html
 <!DOCTYPE html>
@@ -72,8 +71,10 @@ before running Kibanalytics in production.
 </html>
 ```
 
-Alternatively you can access [http://localhost:3000](http://my-kibanalytics-server-host:3000) to interact with some example pages.
+Alternatively you can access [http://localhost:3000](http://localhost:3000) to interact with some example pages.
 
 #### 6. Open Example Dashboard
 
-By accessing [http://localhost:5601/app/dashboards](http://localhost:5601/app/dashboards).
+Accessing [http://localhost:5601/app/dashboards](http://localhost:5601/app/dashboards).
+
+By default, security is disabled for Kibana access.
