@@ -52,6 +52,7 @@ before running Kibanalytics in production.
 | EXPRESS_SESSION_COOKIE_SECURE    |   int    |                                     0, 1 |
 | EXPRESS_SESSION_DURATION         |   int    |                              Number >= 0 |
 | EXPRESS_VALIDATE_JSON_SCHEMA     |   int    |                                     0, 1 |
+| EXPRESS_ANONYMIZE_USER_IP        |   int    |                                     0, 1 |
 | EXPRESS_PUBLIC_FOLDER            |   int    |                                     0, 1 |
 | SENTRY_DSN                       |  string  |                     Valid Sentry DSN URL |
 | LOGSTASH_REDIS_HOST              |  string  |                         Valid Redis host |
@@ -161,6 +162,10 @@ between a user. The session is timed out when there is no activity from the user
 ### EXPRESS_VALIDATE_JSON_SCHEMA
 
 Enable custom event payload validation.
+
+### EXPRESS_ANONYMIZE_USER_IP
+
+Hash user IP address for privacy.
 
 ### EXPRESS_PUBLIC_FOLDER
 
