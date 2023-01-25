@@ -43,6 +43,8 @@ module.exports = (req) => {
 	};
 
 	if (!!process.env.EXPRESS_ANONYMIZE_USER_IP) {
-		req.data.ip.address = crypto.createHash('md5').update(address).digest('hex');
+		req.data.ip.address = crypto.createHash('md5')
+			.update(address + process.env.EXPRESS_ANONYMIZE_USER_IP_SALT)
+			.digest('hex');
 	}
 }

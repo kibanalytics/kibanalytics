@@ -36,39 +36,40 @@ It's recomended to change the EXPRESS_SESSION_SECRET and ELASTICSEARCH_PASSWORD 
 before running Kibanalytics in production.
 :::
 
-| Variable                         |   Type   |                           Allowed Values |
-|:---------------------------------|:--------:|-----------------------------------------:|
-| NODE_ENV                         |  string  |              'development', 'production' |
-| NODE_CLUSTER                     |   int    |                                     0, 1 |
-| NODE_LISTEN                      |  string  |            Valid host IP and port number |
-| EXPRESS_HELMET                   |   int    |                                     0, 1 | 
-| EXPRESS_GZIP                     |   int    |                                     0, 1 |
-| EXPRESS_CORS                     |   int    |                                     0, 1 |
-| EXPRESS_ALLOWED_ORIGINS          | [string] |                         Any valid RegExp |
-| EXPRESS_SESSION_NAME             |  string  |                               Any string |
-| EXPRESS_SESSION_SECRET           |  string  |                               Any string |
-| EXPRESS_SESSION_COOKIE_MAX_AGE   |   int    |                              Number >= 0 |
-| EXPRESS_SESSION_COOKIE_SAME_SITE |  string  |       '0', '1', lax', 'none' or 'strict' |
-| EXPRESS_SESSION_COOKIE_SECURE    |   int    |                                     0, 1 |
-| EXPRESS_SESSION_DURATION         |   int    |                              Number >= 0 |
-| EXPRESS_VALIDATE_JSON_SCHEMA     |   int    |                                     0, 1 |
-| EXPRESS_ANONYMIZE_USER_IP        |   int    |                                     0, 1 |
-| EXPRESS_PUBLIC_FOLDER            |   int    |                                     0, 1 |
-| SENTRY_DSN                       |  string  |                     Valid Sentry DSN URL |
-| LOGSTASH_REDIS_HOST              |  string  |                         Valid Redis host |
-| LOGSTASH_REDIS_PORT              |   int    |             Valid Redis host port number |
-| REDIS_LISTEN                     |  string  |            Valid host IP and port number |
-| REDIS_QUEUE_SERVER_URI           |  string  |                          Valid Redis URI |
-| REDIS_SESSION_SERVER_URI         |  string  |                          Valid Redis URI |
-| TWEMPROXY_LISTEN                 |  string  |            Valid host IP and port number |
-| ELASTICSEARCH_LISTEN             |  string  |            Valid host IP and port number |
-| ELASTICSEARCH_URI                |  string  |                  Valid Elasticsearch URI |
-| ELASTICSEARCH_SECURITY           |   bool   |                              true, false |
-| ELASTICSEARCH_USERNAME           |  string  |                               Any string |
-| ELASTICSEARCH_PASSWORD           |  string  |                               Any string |
-| KIBANA_LISTEN                    |  string  |            Valid host IP and port number |
-| DOCKER_LOG_MAX_SIZE              |  string  |      Number >= 1 suffixed with magnitude |
-| DOCKER_LOG_MAX_FILE              |   int    |                              Number >= 1 |
+| Variable                         |   Type   |                      Allowed Values |
+|:---------------------------------|:--------:|------------------------------------:|
+| NODE_ENV                         |  string  |         'development', 'production' |
+| NODE_CLUSTER                     |   int    |                                0, 1 |
+| NODE_LISTEN                      |  string  |       Valid host IP and port number |
+| EXPRESS_HELMET                   |   int    |                                0, 1 | 
+| EXPRESS_GZIP                     |   int    |                                0, 1 |
+| EXPRESS_CORS                     |   int    |                                0, 1 |
+| EXPRESS_ALLOWED_ORIGINS          | [string] |                    Any valid RegExp |
+| EXPRESS_SESSION_NAME             |  string  |                          Any string |
+| EXPRESS_SESSION_SECRET           |  string  |                          Any string |
+| EXPRESS_SESSION_COOKIE_MAX_AGE   |   int    |                         Number >= 0 |
+| EXPRESS_SESSION_COOKIE_SAME_SITE |  string  |  '0', '1', lax', 'none' or 'strict' |
+| EXPRESS_SESSION_COOKIE_SECURE    |   int    |                                0, 1 |
+| EXPRESS_SESSION_DURATION         |   int    |                         Number >= 0 |
+| EXPRESS_VALIDATE_JSON_SCHEMA     |   int    |                                0, 1 |
+| EXPRESS_ANONYMIZE_USER_IP        |   int    |                                0, 1 |
+| EXPRESS_ANONYMIZE_USER_IP_SALT   |  string  |                          Any string |
+| EXPRESS_PUBLIC_FOLDER            |   int    |                                0, 1 |
+| SENTRY_DSN                       |  string  |                Valid Sentry DSN URL |
+| LOGSTASH_REDIS_HOST              |  string  |                    Valid Redis host |
+| LOGSTASH_REDIS_PORT              |   int    |        Valid Redis host port number |
+| REDIS_LISTEN                     |  string  |       Valid host IP and port number |
+| REDIS_QUEUE_SERVER_URI           |  string  |                     Valid Redis URI |
+| REDIS_SESSION_SERVER_URI         |  string  |                     Valid Redis URI |
+| TWEMPROXY_LISTEN                 |  string  |       Valid host IP and port number |
+| ELASTICSEARCH_LISTEN             |  string  |       Valid host IP and port number |
+| ELASTICSEARCH_URI                |  string  |             Valid Elasticsearch URI |
+| ELASTICSEARCH_SECURITY           |   bool   |                         true, false |
+| ELASTICSEARCH_USERNAME           |  string  |                          Any string |
+| ELASTICSEARCH_PASSWORD           |  string  |                          Any string |
+| KIBANA_LISTEN                    |  string  |       Valid host IP and port number |
+| DOCKER_LOG_MAX_SIZE              |  string  | Number >= 1 suffixed with magnitude |
+| DOCKER_LOG_MAX_FILE              |   int    |                         Number >= 1 |
 
 ### NODE_ENV
 
@@ -166,6 +167,10 @@ Enable custom event payload validation.
 ### EXPRESS_ANONYMIZE_USER_IP
 
 Hash user IP address for privacy.
+
+### EXPRESS_ANONYMIZE_USER_IP_SALT
+
+Salt to be added to user IP address before hashing.
 
 ### EXPRESS_PUBLIC_FOLDER
 
