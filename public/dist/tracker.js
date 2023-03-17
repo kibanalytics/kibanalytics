@@ -198,10 +198,18 @@ __webpack_require__.r(__webpack_exports__);
      */
     const script = document.currentScript;
 
+    const selfHost = (function(s) {
+        try {
+            return (new URL(s.src)).host;
+        } catch (e) {
+            return location.origin;
+        }
+    })(script);
+
     const attr = script.getAttribute.bind(script);
     const listeners = new Map();
 
-    let serverUrl = attr('data-server-url') || `${location.origin}/collect`; // default value
+    let serverUrl = attr('data-server-url') || `${selfHost}/collect`; // default value
     let autoTrack = attr('data-auto-track') !== 'false';
     let eventClassPrefix = attr('data-css-prefix') || 'kbs'; // default value
     let serverSideData = {};
