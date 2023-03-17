@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const fetch = require('node-fetch');
 const delay = require('delay');
 const logger = require('../src/logger');
@@ -66,7 +68,7 @@ async function isKibanaReady() {
         const headers = {
             'content-type': 'application/json'
         };
-        if (process.env.ELASTICSEARCH_SECURITY.toLowerCase() === 'true') {
+        if (process.env.ELASTICSEARCH_SECURITY?.toLowerCase() === 'true') {
             headers['Authorization'] = getAuthenticationHeaders()
         }
 
