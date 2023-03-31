@@ -1731,3 +1731,8 @@ body{
 .modal-window div:not(:last-of-type) {
   margin-bottom: 15px;
 }
+
+.toolbar {
+  opacity: 1 !important;
+  margin: .5rem;
+}

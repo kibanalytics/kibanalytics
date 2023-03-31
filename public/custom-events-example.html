@@ -31,7 +31,8 @@
 				<a href="/class-events-example.html" class="hover:text-green">Class Events</a>
 				<a href="/event-list-example.html" class="hover:text-green">Event List</a>
 				<a href="https://kibanalytics.io/introduction.html" target="_blank" class="hover:text-green">Docs</a>
-				<a href="https://github.com/kibanalytics/kibanalytics" target="_blank" class="hover:text-green">GitHub Repo</a>
+				<a href="https://github.com/kibanalytics/kibanalytics" target="_blank" class="hover:text-green">GitHub
+					Repo</a>
 				<!--Toggle button light/dark theme-->
 				<div class="flex justify-end items-center space-x-2">
 					<div class="flex">
@@ -90,18 +91,41 @@
 			<!--Left item-->
 			<div class="flex flex-col space-y-12 md:mb-32 md:w-1/2">
 				<h1 class="text-[32px] leading-10 font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-green via-red to-green animate-text md:text-4xl md:text-left xl:text-5xl xl:leading-[67px]">
-					Welcome to KBS
+					Custom Events
 				</h1>
 
 				<p class="text-center text-base leading-7 text-lightgray-hero-p dark:text-slate-400 md:text-lg md:text-left md:w-11/12 xl:text-2xl xl:leading-[34px] 2xl:w-full">
-					To start, add the following code snippet to your page. Page views are tracked automatically
-					by default.
+					Track custom events programmatically using JavScript.
 				</p>
-			</div>
 
-			<div class="flex flex-col whitespace-nowrap md:flex-column">
+				<div class="flex flex-col text-center whitespace-nowrap md:flex-row">
+					<!--Button-->
+					<a href="#open-modal"
+					   id="customEventBtn"
+					   class="p-3 px-6 text-lg text-white font-bold bg-green rounded baseline md:hover:bg-green-hover">
+						Trigger Custom Event (from JavaScript)
+					</a>
+				</div>
+			</div>
+			<div class="flex flex-col whitespace-nowrap md:flex-row">
 				<pre>
-					<code id="scriptCodeSnippet" class="language-html"></code>
+					<code class="language-javascript">
+/*
+	Example how to add custom events
+*/
+const { kbs } = window;
+
+document.addEventListener('DOMContentLoaded', () => {
+	const customEventBtn = document.getElementById('customEventBtn');
+	customEventBtn.addEventListener('click', async () => {
+		const data = {
+			id: 'button01',
+			name: 'Custom event'
+		};
+		const response = await kbs.track('customEvent', data);
+		console.log('Programmatically triggered customEvent', response);
+	});
+});</code>
 				</pre>
 			</div>
 		</div>
@@ -113,11 +137,18 @@
 	<p class="text-sm text-center text-darkgray-subheading dark:text-slate-200"></p>
 </footer>
 
+<div id="open-modal" class="modal-window">
+	<div>
+		<a href="#" title="Close" class="modal-close">Close</a>
+		<h1 class="text-green">Event Dispatched</h1>
+		<div>Open Kibana to check the payload.</div>
+	</div>
+</div>
+
 <script src="/vendor/prism/prism.js"></script>
 <script src="/kbs.js"></script>
 <script src="/js/kbs-examples.js"></script>
 <script src="/js/main.js"></script>
-<script src="/js/index.js"></script>
 </body>
 
 </html>

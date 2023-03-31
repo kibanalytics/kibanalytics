@@ -27,8 +27,9 @@
 			<!--Menu items-->
 			<div class="hidden text-sm items-center space-x-6 text-darkgray 2xl:text-[15px] xl:flex">
 				<a href="/" class="hover:text-green">Home</a>
-				<a href="/custom-events.html" class="hover:text-green">Custom Events</a>
-				<a href="/event-list.html" class="hover:text-green">Event List</a>
+				<a href="/custom-events-example.html" class="hover:text-green">Custom Events</a>
+				<a href="/class-events-example.html" class="hover:text-green">Class Events</a>
+				<a href="/event-list-example.html" class="hover:text-green">Event List</a>
 				<a href="https://kibanalytics.io/introduction.html" target="_blank" class="hover:text-green">Docs</a>
 				<a href="https://github.com/kibanalytics/kibanalytics" target="_blank" class="hover:text-green">GitHub
 					Repo</a>
@@ -74,9 +75,10 @@
 			<div id="menu"
 				 class="absolute -ml-4 top-0 flex-col items-center self-end py-8 mt-14 hidden space-y-8 font-bold bg-white border-b border-slate-900/10 dark:bg-slate-900 dark:border-slate-50/[0.06] w-full">
 				<a href="/">Home</a>
-				<a href="/custom-events.html">Example Page 1</a>
-				<a href="/event-list.html">Example Page 2</a>
-				<a href="https://kibanalytics.io/dashboard/" target="_blank">Docs</a>
+				<a href="/custom-events-example.html">Custom Events</a>
+				<a href="/class-events-example.html">Class Events</a>
+				<a href="/event-list-example.html">Event List</a>
+				<a href="https://kibanalytics.io/introduction.html" target="_blank">Docs</a>
 				<a href="https://github.com/kibanalytics/kibanalytics" target="_blank">GitHub Repo</a>
 			</div>
 		</div>
@@ -89,41 +91,28 @@
 			<!--Left item-->
 			<div class="flex flex-col space-y-12 md:mb-32 md:w-1/2">
 				<h1 class="text-[32px] leading-10 font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-green via-red to-green animate-text md:text-4xl md:text-left xl:text-5xl xl:leading-[67px]">
-					Custom Events
+					Class Events
 				</h1>
 
 				<p class="text-center text-base leading-7 text-lightgray-hero-p dark:text-slate-400 md:text-lg md:text-left md:w-11/12 xl:text-2xl xl:leading-[34px] 2xl:w-full">
-					Check this page source code for a base for your implementation. Page views are tracked automatically by default.
+					Track events by simply adding a special prefixed CSS class to HTML elements.
 				</p>
 
 				<div class="flex flex-col text-center whitespace-nowrap md:flex-row">
 					<!--Button-->
 					<a href="#open-modal"
 					   id="customEventBtn"
-					   class="p-3 px-6 text-lg text-white font-bold bg-green rounded baseline md:hover:bg-green-hover">
-						Trigger Custom Event
+					   class="kbs-click-button01 class-event-btn p-3 px-6 text-lg text-white font-bold bg-green rounded baseline md:hover:bg-green-hover">
+						Trigger Event (from CSS class bind)
 					</a>
 				</div>
 			</div>
 			<div class="flex flex-col whitespace-nowrap md:flex-row">
 				<pre>
 					<code class="language-javascript">
-/*
-	Example how to add custom events
-*/
-const { kbs } = window;
+&lt;!-- Example how bind events with CSS classes -->
 
-document.addEventListener('DOMContentLoaded', () => {
-	const customEventBtn = document.getElementById('customEventBtn');
-	customEventBtn.addEventListener('click', async () => {
-		const data = {
-			id: 'button01',
-			name: 'Custom event'
-		};
-		const response = await kbs.track('customEvent', data);
-		console.log('Programmatically triggered customEvent', response);
-	});
-});</code>
+&lt;button class="kbs-click-button01">&lt;/button></code>
 				</pre>
 			</div>
 		</div>
@@ -132,9 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <!--FOOTER-->
 <footer class="bg-footer-bg py-6 mt-14 dark:bg-slate-900 dark:border-t-[1px] dark:border-slate-600">
-	<p class="text-sm text-center text-darkgray-subheading dark:text-slate-200">
-		Powered by <a class="font-semibold text-green" href="https://www.virail.com" target="_blank">Virail GmbH</a>
-	</p>
+	<p class="text-sm text-center text-darkgray-subheading dark:text-slate-200"></p>
 </footer>
 
 <div id="open-modal" class="modal-window">
