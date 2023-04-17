@@ -51,12 +51,12 @@ module.exports = {
             type: 'object',
             properties: {
                 language: { type: 'string' },
-                adBlock: { type: 'boolean' },
+                adblock: { type: 'boolean' },
                 cookies: { type: 'boolean' }
             },
             required: [
                 'language',
-                'adBlock',
+                'adblock',
                 'cookies'
             ],
             additionalProperties: false

@@ -53,7 +53,7 @@ __webpack_require__.r(__webpack_exports__);
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "adBlockEnabled": () => (/* binding */ adBlockEnabled),
+/* harmony export */   "adblockEnabled": () => (/* binding */ adblockEnabled),
 /* harmony export */   "cookiesEnabled": () => (/* binding */ cookiesEnabled),
 /* harmony export */   "getClassPrefixRegExp": () => (/* binding */ getClassPrefixRegExp),
 /* harmony export */   "getEventClassSelector": () => (/* binding */ getEventClassSelector),
@@ -72,7 +72,7 @@ const hook = (_this, method, callback) => {
     };
 };
 
-const adBlockEnabled = () => {
+const adblockEnabled = () => {
     let ade;
     const boe = document.getElementsByTagName('body')[0];
 
@@ -245,7 +245,7 @@ __webpack_require__.r(__webpack_exports__);
 			},
 			browser: {
 				language,
-				adBlock: (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.adBlockEnabled)(),
+				adblock: (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.adblockEnabled)(),
 				cookies: _utils_client_js__WEBPACK_IMPORTED_MODULE_1__.cookiesEnabled
 			},
 			serverSide: serverSideData

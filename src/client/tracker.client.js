@@ -2,7 +2,7 @@
 
 import classListener from './class-listener.client';
 import {
-	adBlockEnabled,
+	adblockEnabled,
 	cookiesEnabled,
 	hook,
 	getClassPrefixRegExp,
@@ -73,7 +73,7 @@ import {
 			},
 			browser: {
 				language,
-				adBlock: adBlockEnabled(),
+				adblock: adblockEnabled(),
 				cookies: cookiesEnabled
 			},
 			serverSide: serverSideData

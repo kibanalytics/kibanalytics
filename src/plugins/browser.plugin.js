@@ -5,8 +5,8 @@ module.exports = (req) => {
     const parsedUserAgent = uaParser(req.headers['user-agent']);
 
     req.data.browser = {
-        engine: parsedUserAgent.engine,
-        ...parsedUserAgent.browser,
+        name: parsedUserAgent.browser.name,
+        version: parsedUserAgent.browser.version,
         ...body.browser
     };
 };

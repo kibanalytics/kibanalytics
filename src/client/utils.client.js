@@ -10,7 +10,7 @@ const hook = (_this, method, callback) => {
     };
 };
 
-const adBlockEnabled = () => {
+const adblockEnabled = () => {
     let ade;
     const boe = document.getElementsByTagName('body')[0];
 
@@ -47,7 +47,7 @@ const getEventClassSelector = (prefix) => `[class*=\'${prefix}-\']`;
 
 export {
     hook,
-    adBlockEnabled,
+    adblockEnabled,
     cookiesEnabled,
     getPrefixedAttributes,
     getClassPrefixRegExp,
