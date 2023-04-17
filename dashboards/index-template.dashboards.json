@@ -32,6 +32,45 @@
           }
         }
       },
+      "device": {
+        "dynamic": false,
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "keyword"
+          },
+          "os": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "keyword"
+              },
+              "version": {
+                "type": "version"
+              }
+            }
+          },
+          "screen": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "height": {
+                "type": "integer"
+              },
+              "width": {
+                "type": "integer"
+              }
+            }
+          },
+          "type": {
+            "type": "keyword"
+          },
+          "vendor": {
+            "type": "keyword"
+          }
+        }
+      },
       "ip": {
         "dynamic": false,
         "type": "object",
