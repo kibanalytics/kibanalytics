@@ -1,6 +1,32 @@
 {
   "mappings": {
     "properties": {
+      "browser": {
+        "properties": {
+          "adblock": {
+            "type": "boolean"
+          },
+          "cookies": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "keyword"
+          },
+          "version": {
+            "type": "version"
+          },
+          "viewport": {
+            "properties": {
+              "height": {
+                "type": "integer"
+              },
+              "width": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
       "ip": {
         "dynamic": true,
         "type": "object",
