@@ -14,7 +14,7 @@ import {
 
 	const {
 		screen,
-		navigator: { language, platform },
+		navigator: { language },
 		location,
 		document,
 		history,
@@ -65,7 +65,6 @@ import {
 				payload
 			},
 			device: {
-				platform,
 				screen: {
 					width: screen.width,
 					height: screen.height

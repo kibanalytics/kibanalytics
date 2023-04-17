@@ -186,7 +186,7 @@ __webpack_require__.r(__webpack_exports__);
 
 	const {
 		screen,
-		navigator: { language, platform },
+		navigator: { language },
 		location,
 		document,
 		history,
@@ -237,7 +237,6 @@ __webpack_require__.r(__webpack_exports__);
 				payload
 			},
 			device: {
-				platform,
 				screen: {
 					width: screen.width,
 					height: screen.height
