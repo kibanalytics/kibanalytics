@@ -97,7 +97,7 @@ module.exports.collect = async (req, res, next) => {
                     This aims to identify "Good bots". Those who voluntarily identify themselves by setting a unique,
                     preferably descriptive, user agent, usually by setting a dedicated request header.
                  */
-                isBot: isBot(req.headers['user-agent']),
+                bot: isBot(req.headers['user-agent']),
                 sessions: 1,
                 events: 0,
                 views: 0
