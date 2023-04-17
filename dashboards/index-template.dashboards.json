@@ -1,7 +1,10 @@
 {
   "mappings": {
+    "dynamic": true,
     "properties": {
       "browser": {
+        "dynamic": false,
+        "type": "object",
         "properties": {
           "adblock": {
             "type": "boolean"
@@ -16,6 +19,8 @@
             "type": "version"
           },
           "viewport": {
+            "dynamic": false,
+            "type": "object",
             "properties": {
               "height": {
                 "type": "integer"
@@ -28,12 +33,20 @@
         }
       },
       "ip": {
-        "dynamic": true,
+        "dynamic": false,
         "type": "object",
-        "enabled": true,
         "properties": {
+          "address": {
+            "type": "ip"
+          },
+          "city": {
+            "type": "keyword"
+          },
           "coords": {
             "type": "geo_point"
+          },
+          "country": {
+            "type": "keyword"
           }
         }
       }
