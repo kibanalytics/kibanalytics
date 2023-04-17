@@ -143,7 +143,6 @@ module.exports.collect = async (req, res, next) => {
         const referrerUrl = body.referrer
             ? new URL(body.referrer)
             : null;
-        const referrerHostname = referrerUrl ? referrerUrl.hostname : '';
 
         const data = {
             url: {
@@ -151,8 +150,11 @@ module.exports.collect = async (req, res, next) => {
                 hostname: url.hostname,
                 path: url.pathname
             },
-            referrer: body.referrer,
-            referrerHostname,
+            referrer: {
+                href: referrerUrl?.href ?? '',
+                hostname: referrerUrl?.hostname ?? '',
+                path: referrerUrl?.pathname ?? ''
+            },
             event: event,
             userAgent: req.headers['user-agent'],
             user: session.user,
