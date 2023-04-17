@@ -6,7 +6,7 @@
         "type": "object",
         "enabled": true,
         "properties": {
-          "ll": {
+          "coords": {
             "type": "geo_point"
           }
         }

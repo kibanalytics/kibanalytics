@@ -18,9 +18,6 @@ module.exports = (req) => {
 		: req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress
 	const ipData = lookup(address) || {};
 
-	// Convert '0' or '1' string to boolean value
-	ipData.eu = ipData.eu === '1';
-
 	/*
 		Elasticsearch Geopoint Field Type
 		Geopoint expressed as an array with the format: [lon, lat]
@@ -30,19 +27,14 @@ module.exports = (req) => {
 	 */
 	ipData.ll = ipData?.ll?.reverse();
 
-	/*
-		To avoid conflict field issue in Elasticsearch
-	 */
-	if (!Array.isArray(ipData.range)) {
-		delete ipData.range;
-	}
-
 	req.data.ip = {
 		address,
-		...ipData
+		city: ipData.city,
+		country: ipData.country,
+		coords: ipData.ll
 	};
 
-	if (!!process.env.EXPRESS_ANONYMIZE_USER_IP) {
+	if (!!+process.env.EXPRESS_ANONYMIZE_USER_IP) {
 		req.data.ip.address = crypto.createHash('md5')
 			.update(address + process.env.EXPRESS_ANONYMIZE_USER_IP_SALT)
 			.digest('hex');
