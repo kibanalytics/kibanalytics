@@ -72,6 +72,10 @@ import {
 			},
 			browser: {
 				language,
+				viewport: {
+					width: window.innerWidth,
+					height: window.innerHeight
+				},
 				adblock: adblockEnabled(),
 				cookies: cookiesEnabled
 			},

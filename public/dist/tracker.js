@@ -244,6 +244,10 @@ __webpack_require__.r(__webpack_exports__);
 			},
 			browser: {
 				language,
+				viewport: {
+					width: window.innerWidth,
+					height: window.innerHeight
+				},
 				adblock: (0,_utils_client_js__WEBPACK_IMPORTED_MODULE_1__.adblockEnabled)(),
 				cookies: _utils_client_js__WEBPACK_IMPORTED_MODULE_1__.cookiesEnabled
 			},

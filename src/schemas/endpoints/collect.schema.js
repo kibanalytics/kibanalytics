@@ -51,6 +51,15 @@ module.exports = {
             type: 'object',
             properties: {
                 language: { type: 'string' },
+                viewport: {
+                    type: 'object',
+                    properties: {
+                        width: { type: 'number' },
+                        height: { type: 'number' }
+                    },
+                    required: ['width', 'height'],
+                    additionalProperties: false
+                },
                 adblock: { type: 'boolean' },
                 cookies: { type: 'boolean' }
             },
