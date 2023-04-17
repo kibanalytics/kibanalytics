@@ -147,11 +147,9 @@ module.exports.collect = async (req, res, next) => {
 
         const data = {
             url: {
+                href: body.url.href,
                 hostname: url.hostname,
-                pathname: url.pathname,
-                search: url.search,
-                hash: url.hash,
-                ...body.url
+                path: url.pathname
             },
             referrer: body.referrer,
             referrerHostname,
