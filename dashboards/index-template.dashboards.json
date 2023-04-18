@@ -118,8 +118,34 @@
         }
       },
       "referrer": {
-        "dynamic": true,
-        "type": "object"
+        "dynamic": false,
+        "type": "object",
+        "properties": {
+          "hostname": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
+          },
+          "href": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
+          },
+          "path": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
+          }
+        }
       },
       "session": {
         "dynamic": true,
@@ -213,8 +239,34 @@
         }
       },
       "url": {
-        "dynamic": true,
-        "type": "object"
+        "dynamic": false,
+        "type": "object",
+        "properties": {
+          "hostname": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
+          },
+          "href": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
+          },
+          "path": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
+          }
+        }
       },
       "user": {
         "dynamic": false,
