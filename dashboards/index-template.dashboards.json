@@ -71,6 +71,10 @@
           }
         }
       },
+      "event": {
+        "dynamic": true,
+        "type": "object"
+      },
       "ip": {
         "dynamic": false,
         "type": "object",
@@ -86,6 +90,42 @@
           },
           "country": {
             "type": "keyword"
+          }
+        }
+      },
+      "referrer": {
+        "dynamic": true,
+        "type": "object"
+      },
+      "session": {
+        "dynamic": true,
+        "type": "object"
+      },
+      "url": {
+        "dynamic": true,
+        "type": "object"
+      },
+      "user": {
+        "dynamic": false,
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "keyword"
+          },
+          "bot": {
+            "type": "boolean"
+          },
+          "events": {
+            "type": "integer"
+          },
+          "new": {
+            "type": "boolean"
+          },
+          "sessions": {
+            "type": "integer"
+          },
+          "views": {
+            "type": "integer"
           }
         }
       }
