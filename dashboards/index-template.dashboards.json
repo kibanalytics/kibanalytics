@@ -147,8 +147,12 @@
           }
         }
       },
-      "session": {
+      "serverSide": {
         "dynamic": true,
+        "type": "object"
+      },
+      "session": {
+        "dynamic": false,
         "type": "object",
         "properties": {
           "_id": {
@@ -265,6 +269,14 @@
                 "type": "keyword"
               }
             }
+          }
+        }
+      },
+      "userAgent": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
           }
         }
       },
