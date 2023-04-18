@@ -72,8 +72,32 @@
         }
       },
       "event": {
-        "dynamic": true,
-        "type": "object"
+        "dynamic": false,
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "keyword"
+          },
+          "payload": {
+            "dynamic": true,
+            "type": "object"
+          },
+          "ts": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "scriptEventStartedDelta": {
+                "type": "date"
+              },
+              "started": {
+                "type": "date"
+              }
+            }
+          },
+          "type": {
+            "type": "keyword"
+          }
+        }
       },
       "ip": {
         "dynamic": false,
