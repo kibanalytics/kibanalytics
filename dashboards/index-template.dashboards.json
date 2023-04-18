@@ -123,7 +123,94 @@
       },
       "session": {
         "dynamic": true,
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "keyword"
+          },
+          "events": {
+            "type": "integer"
+          },
+          "eventsFlow": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "keyword"
+              },
+              "payload": {
+                "dynamic": true,
+                "type": "object"
+              },
+              "ts": {
+                "dynamic": false,
+                "type": "object",
+                "properties": {
+                  "scriptEventStartedDelta": {
+                    "type": "date"
+                  },
+                  "started": {
+                    "type": "date"
+                  }
+                }
+              },
+              "type": {
+                "type": "keyword"
+              }
+            }
+          },
+          "lastEvent": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "keyword"
+              },
+              "payload": {
+                "dynamic": true,
+                "type": "object"
+              },
+              "ts": {
+                "dynamic": false,
+                "type": "object",
+                "properties": {
+                  "scriptEventStartedDelta": {
+                    "type": "date"
+                  },
+                  "started": {
+                    "type": "date"
+                  }
+                }
+              },
+              "type": {
+                "type": "keyword"
+              }
+            }
+          },
+          "new": {
+            "type": "boolean"
+          },
+          "ts": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "currentLastEventStartedDelta": {
+                "type": "date"
+              }
+            }
+          },
+          "views": {
+            "type": "integer"
+          },
+          "viewsFlow": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
+          }
+        }
       },
       "url": {
         "dynamic": true,
