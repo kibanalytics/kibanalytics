@@ -87,7 +87,7 @@
             "type": "object",
             "properties": {
               "scriptEventStartedDelta": {
-                "type": "date"
+                "type": "integer"
               },
               "started": {
                 "type": "date"
@@ -177,7 +177,7 @@
                 "type": "object",
                 "properties": {
                   "scriptEventStartedDelta": {
-                    "type": "date"
+                    "type": "integer"
                   },
                   "started": {
                     "type": "date"
@@ -205,7 +205,7 @@
                 "type": "object",
                 "properties": {
                   "scriptEventStartedDelta": {
-                    "type": "date"
+                    "type": "integer"
                   },
                   "started": {
                     "type": "date"
@@ -225,7 +225,7 @@
             "type": "object",
             "properties": {
               "currentLastEventStartedDelta": {
-                "type": "date"
+                "type": "integer"
               }
             }
           },
