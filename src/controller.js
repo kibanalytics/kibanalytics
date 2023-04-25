@@ -2,6 +2,7 @@ const os = require('os');
 const path = require('path');
 const fs = require('fs/promises');
 const util = require('util');
+const _ = require('lodash');
 const { v4: uuidv4 } = require('uuid');
 const isBot = require('isbot');
 
@@ -10,11 +11,10 @@ const validator = require('./validator');
 const validateCollectEndpoint = validator.getSchema('collectEndpoint');
 const plugins = require('./plugins');
 
-
-/*
-    @TODO Maybe is time to create a config.json file as .env file is starting to get to big
- */
-const EVENT_FLOW_WITH_PAYLOAD = true; // @TODO make this configurable
+const EVENT_FLOW_PAYLOAD_FIELDS = process.env.EXPRESS_EVENT_FLOW_PAYLOAD_FIELDS
+    ?.split(',')
+    ?.map(v => v.trim())
+    || [];
 const SESSION_DURATION = +process.env.EXPRESS_SESSION_DURATION || 1800000; // 30 minutes
 const UPGRADE_FILE_NAME = '.UPGRADE';
 
@@ -130,7 +130,11 @@ module.exports.collect = async (req, res, next) => {
             href: body.url.href,
             type: event.type,
             ts: event.ts,
-            payload: EVENT_FLOW_WITH_PAYLOAD ? event.payload : null
+            payload: EVENT_FLOW_PAYLOAD_FIELDS.reduce((accumulator, path) => {
+                const value = _.get(body.event.payload, path);
+                if (value) _.set(accumulator, path, value);
+                return accumulator;
+            }, {})
         });
 
         if (eventType === 'pageview') {
@@ -174,7 +178,7 @@ module.exports.collect = async (req, res, next) => {
         req.data = data; // data context reference for plugins
         for (const plugin of plugins) plugin(req);
 
-        session.lastEvent = data.event;
+        session.lastEvent = _.last(session.eventsFlow);
         await redisClient.rPush(process.env.REDIS_QUEUE_KEY, JSON.stringify(data));
 
         res.json({
