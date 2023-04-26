@@ -217,9 +217,6 @@
               }
             }
           },
-          "new": {
-            "type": "boolean"
-          },
           "ts": {
             "dynamic": false,
             "type": "object",

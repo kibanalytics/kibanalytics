@@ -13,7 +13,9 @@ const Sentry = require('@sentry/node');
 const helmet = require('helmet');
 const cors = require('cors');
 const corsOptions = require('./src/cors-options');
+const cookieParser = require('cookie-parser');
 const session = require('./src/session');
+const user = require('./src/user');
 const controller = require('./src/controller');
 const errorHandler = require('./src/error-handler');
 
@@ -25,6 +27,7 @@ const init = async () => {
     const app = express();
 
     app.use(bodyParser.json());
+    app.use(cookieParser(process.env.EXPRESS_SESSION_SECRET));
 
     app.use(expressWinston.logger({
         winstonInstance: logger,
@@ -78,6 +81,7 @@ const init = async () => {
     });
 
     app.use(session);
+    app.use(user);
     /*
         If you have node.js behind a proxy and are using cookies secure: true,
         you need to set "trust proxy" in express.
