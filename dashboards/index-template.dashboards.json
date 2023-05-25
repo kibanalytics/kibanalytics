@@ -221,8 +221,8 @@
             "dynamic": false,
             "type": "object",
             "properties": {
-              "currentLastEventStartedDelta": {
-                "type": "integer"
+              "started": {
+                "type": "date"
               }
             }
           },
@@ -299,6 +299,15 @@
           },
           "sessions": {
             "type": "integer"
+          },
+          "ts": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "started": {
+                "type": "date"
+              }
+            }
           },
           "views": {
             "type": "integer"

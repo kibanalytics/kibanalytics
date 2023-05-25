@@ -17,10 +17,10 @@ const EVENT_FLOW_PAYLOAD_FIELDS = process.env.EXPRESS_EVENT_FLOW_PAYLOAD_FIELDS
 		?.map(v => v.trim())
 	|| [];
 const USER_COOKIE_OPTIONS = {
-    ...cookieOptions,
-    maxAge: process.env.EXPRESS_USER_MAX_AGE
-	    ? +process.env.EXPRESS_USER_MAX_AGE
-	    : 31104000000 // default to 1y
+	...cookieOptions,
+	maxAge: process.env.EXPRESS_USER_MAX_AGE
+		? +process.env.EXPRESS_USER_MAX_AGE
+		: 31104000000 // default to 1y
 };
 const UPGRADE_FILE_NAME = '.UPGRADE';
 
@@ -31,7 +31,6 @@ module.exports.collect = async (req, res, next) => {
 
 	try {
 		const { body } = req;
-		body.event.ts.started = eventTs;
 
 		if (!validateCollectEndpoint(body)) {
 			res.status(422).json({
@@ -42,6 +41,7 @@ module.exports.collect = async (req, res, next) => {
 			return;
 		}
 
+		body.event.ts.started = eventTs;
 		const eventType = body.event.type;
 
 		if (!!+process.env.EXPRESS_VALIDATE_JSON_SCHEMA && eventType !== 'pageview') {
@@ -69,7 +69,7 @@ module.exports.collect = async (req, res, next) => {
 			session.views = 0;
 			session.viewsFlow = [];
 			session.ts = {
-				started: body.event.ts.started
+				started: eventTs
 			};
 
 			/*
@@ -80,6 +80,12 @@ module.exports.collect = async (req, res, next) => {
 			}
 
 			user.sessions++;
+		}
+
+		if (user.new && !user.ts) {
+			user.ts = {
+				started: eventTs
+			};
 		}
 
 		const event = {
@@ -149,10 +155,10 @@ module.exports.collect = async (req, res, next) => {
 		await redisClient.rPush(process.env.REDIS_QUEUE_KEY, JSON.stringify(data));
 
 		/*
-			Storing the user data in the front-end with a cookie & hashed JWT token
+			Storing the user data in the front-end with a cookie & signed JWT token
 		 */
-        const signedUserToken = await jwt.sign(user, process.env.EXPRESS_SECRET);
-        res.cookie(`${process.env.EXPRESS_COOKIE_NAME}_user`, signedUserToken, USER_COOKIE_OPTIONS);
+		const signedUserToken = await jwt.sign(user, process.env.EXPRESS_SECRET);
+		res.cookie(`${process.env.EXPRESS_COOKIE_NAME}_user`, signedUserToken, USER_COOKIE_OPTIONS);
 
 		res.json({
 			status: 'success',
