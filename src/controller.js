@@ -9,12 +9,13 @@ const redisClient = require('./redis-queue-client');
 const validator = require('./validator');
 const validateCollectEndpoint = validator.getSchema('collectEndpoint');
 const plugins = require('./plugins');
+const logger = require('./logger');
 
 
 /*
     @TODO Maybe is time to create a config.json file as .env file is starting to get to big
  */
-const EVENT_FLOW_WITH_PAYLOAD = true; // @TODO make this configurable
+const EVENT_FLOW_WITH_PAYLOAD = false; // @TODO make this configurable
 const SESSION_DURATION = +process.env.EXPRESS_SESSION_DURATION || 1800000; // 30 minutes
 const UPGRADE_FILE_NAME = '.UPGRADE';
 
@@ -112,6 +113,18 @@ module.exports.collect = async (req, res, next) => {
             req.session.ts = {
                 started: body.event.ts.scriptStarted
             };
+
+            try {
+                qs = Object.fromEntries(new URL(body.url.href).searchParams);
+                req.session.first = {
+                    url: {
+                        firstUrl: body.url.href,
+                        qs: qs
+                    }
+                }
+            } catch (error) {
+                logger.error(`Error parsing URL: ${error}`);
+            }
         }
 
         // req.session pointer will not change anymore
@@ -166,7 +179,8 @@ module.exports.collect = async (req, res, next) => {
                 lastEvent: session.lastEvent,
                 views: session.views,
                 viewsFlow: session.viewsFlow,
-                ts: req.session.ts
+                ts: req.session.ts,
+                first: session.first
             },
             serverSide: body.serverSide // @TODO maybe changing property name to custom ?
         };
