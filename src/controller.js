@@ -18,6 +18,7 @@ const logger = require('./logger');
 const EVENT_FLOW_WITH_PAYLOAD = false; // @TODO make this configurable
 const SESSION_DURATION = +process.env.EXPRESS_SESSION_DURATION || 1800000; // 30 minutes
 const UPGRADE_FILE_NAME = '.UPGRADE';
+const ALLOWED_FIRST_QS = process.env.ALLOWED_FIRST_QS ? process.env.ALLOWED_FIRST_QS.split(',') : [];
 
 const redisPing = util.promisify(redisClient.ping);
 
@@ -115,7 +116,15 @@ module.exports.collect = async (req, res, next) => {
             };
 
             try {
-                qs = Object.fromEntries(new URL(body.url.href).searchParams);
+                const unFilteredQs = Object.fromEntries(new URL(body.url.href).searchParams);
+
+                const qs = {};
+                ALLOWED_FIRST_QS.forEach(key => {
+                    if (unFilteredQs[key]) {
+                        qs[key] = unFilteredQs[key];
+                    }
+                });
+
                 req.session.first = {
                     url: {
                         firstUrl: body.url.href,
